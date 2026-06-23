@@ -2,7 +2,7 @@ USE term_project;
 
 -- ============================================================
 -- Clear old seed data
--- Safe for development/testing
+-- get rid of this submission version 
 -- ============================================================
 
 SET FOREIGN_KEY_CHECKS = 0;
@@ -35,8 +35,8 @@ INSERT INTO genres (name) VALUES
 ('Family');
 
 -- ============================================================
--- Real movies
--- 5 currently_playing, 5 coming_soon for your CES demo
+-- movies
+-- 5 currently_playing, 5 coming_soon
 -- ============================================================
 
 INSERT INTO movies (
@@ -56,7 +56,7 @@ VALUES
     'Obsession',
     'After breaking the mysterious "One Wish Willow" to win his crushs heart, a hopeless romantic finds himself getting exactly what he asked for but soon discovers that some desires come at a dark, sinister price.',
     'placehold Poster',
-    'placehold trailer',
+    'https://www.youtube.com/watch?v=xJYoN-fX2j0',
     'R',
     'Michael Jonhston, Inde Navarrette, Cooper Tomlinson, Megan Lawless, Andy Richter, Haley Fitzgerald, Darin Toonder, Anthony Pavone, Anthony Casabianca, Chloe Breen, Malcom Kelner',
     108,
@@ -67,7 +67,7 @@ VALUES
     'Scary Movie',
     'Twenty-six years after outrunning a suspiciously familiar masked killer, Shorty, Ray, Cindy and Brenda find themselves targeted by another mad slasher..',
     'placehold Poster',
-    'placehold trailer',
+    'https://www.youtube.com/watch?v=0fZ58S-7QP0',
     'R',
     'Marlon Wayans, Shawn Wayans, Anna Faris, Regina Hall, Kenan Thompson, Dave Sheridan, Lochlyn Munro, Kim Wayans, Cheri Oteri, Chris Elliott, Damon Wayans Jr, Heidi Gardner, Olivia Rose Keegan, Cameron Scott Roberts, Savannah Lee May, Sydney Park, Cregg Wayans, Benny Zielke .',
     96,
@@ -78,7 +78,7 @@ VALUES
     'Toy Story 5',
     'Woody (voice of Tom Hanks), Buzz Lightyear (voice of Tim Allen), Jessie (voice of Joan Cusack) and the rest of the gangs jobs are challenged when they come face-to-face with Lilypad (voice of Greta Lee), a brand-new tablet device that arrives with her own disruptive ideas about what is best for their kid, Bonnie. Will playtime ever be the same?.',
     'placehold Poster',
-    'placehold trailer',
+    'https://www.youtube.com/watch?v=c51ND9Hdbw0',
     'PG',
     'Tom Hanks, Tim Allen, Joan Cusack, Tony Hate, Conan OBrien, Greta Lee, Ernie Hudson.',
     102,
@@ -89,7 +89,7 @@ VALUES
     'Disclosure Day',
     'If you found out we werent alone, if someone showed you, proved it to you, would that frighten you? This summer, the truth belongs to eight billion people. Today is... Disclosure Day.',
     'placehold Poster',
-    'placehold trailer',
+    'https://www.youtube.com/watch?v=SCYT8vb2siQ',
     'PG-13',
     'Emily Blunt, Josh OConnor, Colin Firth, Eve Hewson, Colman Domingo, Wyatt Russell, Henry Lloyd-Hughes, Elizabeth Marvel.',
     145,
@@ -100,7 +100,7 @@ VALUES
     'Star Wars: The Mandalorian and Grogu',
     'The evil Empire has fallen, and Imperial warlords remain scattered throughout the galaxy. As the fledgling New Republic works to protect everything the Rebellion fought for, they have enlisted the help of legendary Mandalorian bounty hunter Din Djarin (Pedro Pascal) and his young apprentice Grogu..',
     'placehold Poster',
-    'placehold trailer',
+    'https://www.youtube.com/watch?v=IHWlvwu8t1w',
     'PG-13',
     'Pedro Pascal, Sigourney Weaver, Jermey Allen White, Jonathan Coyne',
     172,
@@ -113,7 +113,7 @@ VALUES
     'Spider-Man: Brand New Day',
     'It is a BRAND NEW DAY for Peter Parker. Fighting crime full-time as Spider-Man in a world that doesn’t remember him.',
     'placehold Poster',
-    'placehold trailer',
+    'https://www.youtube.com/watch?v=8TZMtslA3UY',
     'PG-13',
     'Tom Holland, Zendaya, Jacob Batalon, Sadie Sink, Mark Ruffalo, Jon Bernthal',
     140,
@@ -124,7 +124,7 @@ VALUES
     'Moana',
     'Moana (Catherine Lagaaia) answers the Oceans call and, for the first time, voyages beyond the reef of her island of Motunui with the infamous demigod Maui (Dwayne Johnson) on an unforgettable journey to restore prosperity to her people.',
     'placehold Poster',
-    'placehold trailer',
+    'https://www.youtube.com/watch?v=EEz5xbzYPKI',
     'PG',
     'Catherine Lagaaia, Dwayne Johnson, Rena Owen, John Tui, Frankie Adams',
     115,
@@ -135,7 +135,7 @@ VALUES
     'Minions & Monsters',
     'This is the rambunctious, ridiculous and totally true story of how the Minions conquered Hollywood, became movie stars, lost everything, unleashed monsters onto the world and then banded together to try and save the planet from the mayhem they had just created..',
     'placehold Poster',
-    'placehold trailer',
+    'phttps://www.youtube.com/watch?v=ZSdOwt-G49w',
     'PG-13',
     'Pierre Coffine, Allison Janney, Christoph Waltz, Jeff Bridges, Jesse Elsenberg, Zoey Deutch, Bobby Moynihan, Phill LaMarr, Try Parker',
     90,
@@ -145,8 +145,8 @@ VALUES
 (
     'The Invite',
     'Joe and Angelas marriage is on thin ice. When they invite their enigmatic upstairs neighbors for a dinner party, the night spirals into unexpected places. Have they reignited the spark or lit the match that burns it all down?.',
-  'placehold Poster',
-    'placehold trailer',
+    'placehold Poster',
+    'https://www.youtube.com/watch?v=OJ19I9q_hOQ',
     'R',
     'Olivia Wilde, Seth Rogan, Penelope Cruz, Edward Norton',
     107,
@@ -157,7 +157,7 @@ VALUES
     'Supergirl',
     'When an unexpected and ruthless adversary strikes too close to home, Kara Zor-El, aka Supergirl, reluctantly joins forces with an unlikely companion on an epic, interstellar journey of vengeance and justice..',
     'placehold Poster',
-    'placehold trailer',
+    'https://www.youtube.com/watch?v=s1-pfiVMKAs',
     'PG-13',
     'Milly Alcock, Jason Momoa, Matthias Schoenaerts, Eve Ridley, David Krumholtz, Emily Beecham',
     169,
@@ -285,7 +285,7 @@ JOIN (
 
 -- ============================================================
 -- Showtimes
--- Only currently_playing movies get showtimes for Sprint 1
+-- Only currently_playing movies get showtimes
 -- ============================================================
 
 INSERT INTO showtimes (
