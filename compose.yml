@@ -1,0 +1,19 @@
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: term-project-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: term_project_root
+      MYSQL_DATABASE: term_project
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-pterm_project_root"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+
+volumes:
+  mysql-data:
