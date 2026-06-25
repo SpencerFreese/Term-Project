@@ -22,15 +22,28 @@ The included `compose.yml` starts MySQL on port `3306` with:
 ## Load Schema And Seed Data
 
 Run the schema file first:
-
-```zsh
+```bash
 docker compose exec -T mysql mysql -uroot -pterm_project_root < db/database_setup.sql
 ```
 
 Then seed the movie data:
 
-```zsh
+```bash
 docker compose exec -T mysql mysql -uroot -pterm_project_root term_project < db/seed_movies.sql
+```
+
+### Option 2: Windows PowerShell
+
+Run the schema file first:
+
+```powershell
+Get-Content db/database_setup.sql | docker compose exec -T mysql mysql -uroot -pterm_project_root
+```
+
+Then seed the movie data:
+
+```powershell
+Get-Content db/seed_movies.sql | docker compose exec -T mysql mysql -uroot -pterm_project_root term_project
 ```
 
 ## Start The App
@@ -60,12 +73,34 @@ MYSQL_USER=root
 MYSQL_PASSWORD=term_project_root
 MYSQL_DATABASE=term_project
 ```
-
 ## Project Structure
 
-- `compose.yml`: local MySQL container
-- `db/database_setup.sql`: schema creation
-- `db/seed_movies.sql`: movie seed data
-- `lib/db.ts`: server-only MySQL pool
-- `lib/movies.ts`: movie queries used by the homepage
-- `app/page.tsx`: renders currently playing and coming soon movies
+```txt
+app/                         Next.js App Router pages and API routes
+app/page.tsx                 Homepage that renders movie data
+app/api/                     Backend API routes
+app/movies/[movieId]/        Movie details page route
+app/booking/[showtimeId]/    Booking prototype route
+db/                          Database SQL files
+db/database_setup.sql        Database schema creation
+db/seed_movies.sql           Movie, genre, theater room, seat, and showtime seed data
+lib/db.ts                    Server-only MySQL connection pool
+lib/repositories/            Database query layer
+lib/services/                Business logic layer
+lib/movies.ts                Compatibility wrapper for movie service functions
+compose.yml                  Local MySQL Docker container setup
+public/                      Static assets
+```
+
+## Backend Structure
+
+The backend is organized into layers:
+
+```txt
+API Route -> Service -> Repository -> Database
+```
+
+- API routes handle HTTP requests and responses
+- Services contain business logic
+- Repositories contain SQL queries
+- `lib/db.ts` manages the MySQL connection pool
