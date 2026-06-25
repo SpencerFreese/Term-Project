@@ -1,4 +1,6 @@
+import Link from "next/link";
 import { getComingSoonMovies, getCurrentlyPlayingMovies } from "@/lib/movies";
+
 
 export const dynamic = "force-dynamic";
 
@@ -57,6 +59,12 @@ function MovieSection({
                 <p className="max-w-3xl text-sm leading-6 text-zinc-600 dark:text-zinc-400">
                   {movie.description ?? "Description coming soon."}
                 </p>
+                <Link
+                  href={`/movies/${movie.movieId}`}
+                  className="inline-flex rounded-lg bg-zinc-950 px-4 py-2 text-sm font-medium text-white dark:bg-zinc-50 dark:text-zinc-950"
+                >             
+                  View Details
+                </Link>
               </div>
               <dl className="grid min-w-44 gap-2 text-sm text-zinc-600 dark:text-zinc-400">
                 <div>
