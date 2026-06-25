@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getComingSoonMovies, getCurrentlyPlayingMovies } from "@/lib/movies";
 
 
+
 export const dynamic = "force-dynamic";
 
 type HomeDataResult =
@@ -159,12 +160,50 @@ export default async function Home() {
           renders both seeded movie categories.
         </p>
       </section>
+<form
+        action="/"
+        className="flex flex-col gap-3 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-950 sm:flex-row"
+      >
+        <input
+          type="search"
+          name="search"
+          defaultValue={searchTerm}
+          placeholder="Search movies by title..."
+          className="min-h-11 flex-1 rounded-lg border border-zinc-300 bg-white px-4 text-sm text-zinc-950 outline-none focus:border-zinc-950 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50 dark:focus:border-zinc-300"
+        />
 
-      <MovieSection
-        title="Currently Running"
-        movies={result.currentlyPlaying}
-      />
-      <MovieSection title="Coming Soon" movies={result.comingSoon} />
+        <button
+          type="submit"
+          className="min-h-11 rounded-lg bg-zinc-950 px-5 text-sm font-medium text-white dark:bg-zinc-50 dark:text-zinc-950"
+        >
+          Search
+        </button>
+
+        {searchTerm ? (
+          <Link
+            href="/"
+            className="inline-flex min-h-11 items-center justify-center rounded-lg border border-zinc-300 px-5 text-sm font-medium text-zinc-700 dark:border-zinc-700 dark:text-zinc-300"
+          >
+            Clear
+          </Link>
+        ) : null}
+      </form>
+
+      {searchTerm ? (
+        <MovieSection
+          title={`Search Results for "${searchTerm}"`}
+          movies={result.searchResults}
+        />
+      ) : (
+        <>
+          <MovieSection
+            title="Currently Playing"
+            movies={result.currentlyPlaying}
+          />
+
+          <MovieSection title="Coming Soon" movies={result.comingSoon} />
+        </>
+      )}
     </main>
   );
 }
