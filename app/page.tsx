@@ -1,4 +1,12 @@
 import Link from "next/link";
+
+import {
+  getComingSoonMovies,
+  getCurrentlyPlayingMovies,
+  getMovieSearchResults,
+  type Movie,
+} from "@/lib/movies";
+
 import { getComingSoonMovies, getCurrentlyPlayingMovies } from "@/lib/movies";
 
 
