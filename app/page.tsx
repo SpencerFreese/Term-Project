@@ -1,9 +1,11 @@
 import Link from "next/link";
 
 import {
+  getAllGenres,
   getComingSoonMovies,
   getCurrentlyPlayingMovies,
   getMovieSearchResults,
+  type Genre,
   type Movie,
 } from "@/lib/movies";
 
@@ -14,7 +16,8 @@ type HomeDataResult =
       ok: true;
       currentlyPlaying: Movie[];
       comingSoon: Movie[];
-      searchResults: Movie[];
+      filteredResults: Movie[] | null;
+      genres: Genre[];
     }
   | {
       ok: false;
@@ -121,19 +124,27 @@ function MovieSection({
   );
 }
 
-async function loadHomeData(searchTerm: string): Promise<HomeDataResult> {
+async function loadHomeData(
+  searchTerm: string,
+  genre: string,
+): Promise<HomeDataResult> {
   try {
-    const [currentlyPlaying, comingSoon, searchResults] = await Promise.all([
-      getCurrentlyPlayingMovies(),
-      getComingSoonMovies(),
-      searchTerm ? getMovieSearchResults(searchTerm) : Promise.resolve([]),
-    ]);
+    const [currentlyPlaying, comingSoon, filteredResults, genres] =
+      await Promise.all([
+        getCurrentlyPlayingMovies(),
+        getComingSoonMovies(),
+        searchTerm || genre
+          ? getMovieSearchResults(searchTerm || undefined, genre || undefined)
+          : Promise.resolve(null),
+        getAllGenres(),
+      ]);
 
     return {
       ok: true,
       currentlyPlaying,
       comingSoon,
-      searchResults,
+      filteredResults,
+      genres,
     };
   } catch (error) {
     return {
@@ -147,12 +158,14 @@ async function loadHomeData(searchTerm: string): Promise<HomeDataResult> {
 export default async function Home({
   searchParams,
 }: {
-  searchParams: Promise<{ search?: string }>;
+  searchParams: Promise<{ search?: string; genre?: string; showDate?: string }>;
 }) {
   const resolvedSearchParams = await searchParams;
   const searchTerm = resolvedSearchParams.search?.trim() ?? "";
+  const genre = resolvedSearchParams.genre?.trim() ?? "";
+  const showDate = resolvedSearchParams.showDate?.trim() ?? "";
 
-  const result = await loadHomeData(searchTerm);
+  const result = await loadHomeData(searchTerm, genre);
 
   if (!result.ok) {
     return (
@@ -198,7 +211,7 @@ export default async function Home({
 
       <form
         action="/"
-        className="flex flex-col gap-3 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-950 sm:flex-row"
+        className="flex flex-col gap-3 rounded-2xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-950 sm:flex-row sm:items-end"
       >
         <input
           type="search"
@@ -208,14 +221,52 @@ export default async function Home({
           className="min-h-11 flex-1 rounded-lg border border-zinc-300 bg-white px-4 text-sm text-zinc-950 outline-none focus:border-zinc-950 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50 dark:focus:border-zinc-300"
         />
 
+        <div className="flex flex-col gap-1">
+          <label
+            htmlFor="genre"
+            className="text-xs font-medium uppercase tracking-wide text-zinc-500 dark:text-zinc-400"
+          >
+            Genre
+          </label>
+          <select
+            id="genre"
+            name="genre"
+            defaultValue={genre}
+            className="min-h-11 rounded-lg border border-zinc-300 bg-white px-4 text-sm text-zinc-950 outline-none focus:border-zinc-950 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50 dark:focus:border-zinc-300"
+          >
+            <option value="">All Genres</option>
+            {result.genres.map((genreOption) => (
+              <option key={genreOption.genreId} value={genreOption.name}>
+                {genreOption.name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="flex flex-col gap-1">
+          <label
+            htmlFor="showDate"
+            className="text-xs font-medium uppercase tracking-wide text-zinc-500 dark:text-zinc-400"
+          >
+            Show Date
+          </label>
+          <input
+            type="date"
+            id="showDate"
+            name="showDate"
+            defaultValue={showDate}
+            className="min-h-11 rounded-lg border border-zinc-300 bg-white px-4 text-sm text-zinc-950 outline-none focus:border-zinc-950 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50 dark:focus:border-zinc-300"
+          />
+        </div>
+
         <button
           type="submit"
           className="min-h-11 rounded-lg bg-zinc-950 px-5 text-sm font-medium text-white dark:bg-zinc-50 dark:text-zinc-950"
         >
-          Search
+          Apply Filters
         </button>
 
-        {searchTerm ? (
+        {searchTerm || genre || showDate ? (
           <Link
             href="/"
             className="inline-flex min-h-11 items-center justify-center rounded-lg border border-zinc-300 px-5 text-sm font-medium text-zinc-700 dark:border-zinc-700 dark:text-zinc-300"
@@ -225,10 +276,14 @@ export default async function Home({
         ) : null}
       </form>
 
-      {searchTerm ? (
+      {searchTerm || genre ? (
         <MovieSection
-          title={`Search Results for "${searchTerm}"`}
-          movies={result.searchResults}
+          title={
+            searchTerm
+              ? `Search Results for "${searchTerm}"`
+              : `Genre: ${genre}`
+          }
+          movies={result.filteredResults ?? []}
         />
       ) : (
         <>

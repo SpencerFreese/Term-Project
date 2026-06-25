@@ -1,9 +1,10 @@
 import "server-only";
-
+export const dynamic = 'force-dynamic'
 import { type RowDataPacket } from "mysql2/promise";
 import { query } from "@/lib/db";
 
 export type MovieStatus = "currently_playing" | "coming_soon";
+
 
 export type Movie = {
   movieId: number;
