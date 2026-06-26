@@ -1,10 +1,9 @@
 import "server-only";
-export const dynamic = 'force-dynamic'
+
 import { type RowDataPacket } from "mysql2/promise";
 import { query } from "@/lib/db";
 
 export type MovieStatus = "currently_playing" | "coming_soon";
-
 
 export type Movie = {
   movieId: number;
@@ -18,6 +17,13 @@ export type Movie = {
   releaseDate: string | null;
   status: MovieStatus;
   genres: string | null;
+};
+
+export type MovieFilters = {
+  status?: MovieStatus;
+  searchTerm?: string;
+  genres?: string[];
+  showDate?: string;
 };
 
 type MovieRow = RowDataPacket & Movie;
@@ -40,16 +46,75 @@ const MOVIE_SELECT = `
   LEFT JOIN genres g ON mg.genre_id = g.genre_id
 `;
 
-export async function findMoviesByStatus(status: MovieStatus) {
+function cleanGenres(genres?: string[]) {
+  return [...new Set((genres ?? []).map((genre) => genre.trim()).filter(Boolean))];
+}
+
+function isValidShowDate(showDate?: string) {
+  return Boolean(showDate && /^\d{4}-\d{2}-\d{2}$/.test(showDate));
+}
+
+export async function findMovies(filters: MovieFilters = {}) {
+  const whereClauses: string[] = [];
+  const params: Array<string | number> = [];
+
+  if (filters.status) {
+    whereClauses.push("m.status = ?");
+    params.push(filters.status);
+  }
+
+  if (filters.searchTerm?.trim()) {
+    whereClauses.push("m.title LIKE ?");
+    params.push(`%${filters.searchTerm.trim()}%`);
+  }
+
+  const selectedGenres = cleanGenres(filters.genres);
+
+  if (selectedGenres.length > 0) {
+    const placeholders = selectedGenres.map(() => "?").join(", ");
+
+    whereClauses.push(`
+      m.movie_id IN (
+        SELECT mg2.movie_id
+        FROM movie_genres mg2
+        JOIN genres g2 ON mg2.genre_id = g2.genre_id
+        WHERE g2.name IN (${placeholders})
+        GROUP BY mg2.movie_id
+        HAVING COUNT(DISTINCT g2.name) = ?
+      )
+    `);
+
+    params.push(...selectedGenres, selectedGenres.length);
+  }
+
+  if (isValidShowDate(filters.showDate)) {
+    whereClauses.push(`
+      EXISTS (
+        SELECT 1
+        FROM showtimes s2
+        WHERE s2.movie_id = m.movie_id
+          AND s2.status = 'scheduled'
+          AND s2.start_time >= ?
+          AND s2.start_time < DATE_ADD(?, INTERVAL 1 DAY)
+      )
+    `);
+
+    params.push(filters.showDate!, filters.showDate!);
+  }
+
   return query<MovieRow>(
     `
       ${MOVIE_SELECT}
-      WHERE m.status = ?
+      ${whereClauses.length > 0 ? `WHERE ${whereClauses.join(" AND ")}` : ""}
       GROUP BY m.movie_id
       ORDER BY m.release_date ASC, m.title ASC
     `,
-    [status],
+    params,
   );
+}
+
+export async function findMoviesByStatus(status: MovieStatus) {
+  return findMovies({ status });
 }
 
 export async function findMovieById(movieId: number) {
@@ -67,31 +132,9 @@ export async function findMovieById(movieId: number) {
 }
 
 export async function searchMovies(searchTerm: string) {
-  return query<MovieRow>(
-    `
-      ${MOVIE_SELECT}
-      WHERE m.title LIKE ?
-      GROUP BY m.movie_id
-      ORDER BY m.title ASC
-    `,
-    [`%${searchTerm}%`],
-  );
+  return findMovies({ searchTerm });
 }
 
 export async function findMoviesByGenre(genreName: string) {
-  return query<MovieRow>(
-    `
-      ${MOVIE_SELECT}
-      WHERE EXISTS (
-        SELECT 1
-        FROM movie_genres mg2
-        JOIN genres g2 ON mg2.genre_id = g2.genre_id
-        WHERE mg2.movie_id = m.movie_id
-          AND g2.name = ?
-      )
-      GROUP BY m.movie_id
-      ORDER BY m.title ASC
-    `,
-    [genreName],
-  );
+  return findMovies({ genres: [genreName] });
 }

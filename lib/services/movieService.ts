@@ -2,40 +2,44 @@ import "server-only";
 
 import {
   findMovieById,
-  findMoviesByGenre,
-  findMoviesByStatus,
-  searchMovies,
+  findMovies,
+  type MovieFilters,
   type MovieStatus,
 } from "@/lib/repositories/movieRepository";
 import { findShowtimesByMovieId } from "@/lib/repositories/showtimeRepository";
 
-export async function getMoviesByStatus(status: MovieStatus) {
-  return findMoviesByStatus(status);
+export async function getMoviesByStatus(
+  status: MovieStatus,
+  filters: Omit<MovieFilters, "status"> = {},
+) {
+  return findMovies({
+    ...filters,
+    status,
+  });
 }
 
-export async function getCurrentlyPlayingMovies() {
-  return getMoviesByStatus("currently_playing");
+export async function getCurrentlyPlayingMovies(
+  filters: Omit<MovieFilters, "status"> = {},
+) {
+  return getMoviesByStatus("currently_playing", filters);
 }
 
-export async function getComingSoonMovies() {
-  return getMoviesByStatus("coming_soon");
+export async function getComingSoonMovies(
+  filters: Omit<MovieFilters, "status"> = {},
+) {
+  return getMoviesByStatus("coming_soon", filters);
 }
 
-export async function getMovieSearchResults(searchTerm?: string, genre?: string) {
-  if (searchTerm && searchTerm.trim()) {
-    return searchMovies(searchTerm.trim());
-  }
-
-  if (genre && genre.trim()) {
-    return findMoviesByGenre(genre.trim());
-  }
-
-  const [currentlyPlaying, comingSoon] = await Promise.all([
-    getCurrentlyPlayingMovies(),
-    getComingSoonMovies(),
-  ]);
-
-  return [...currentlyPlaying, ...comingSoon];
+export async function getMovieSearchResults(
+  searchTerm?: string,
+  genres: string[] = [],
+  showDate?: string,
+) {
+  return findMovies({
+    searchTerm,
+    genres,
+    showDate,
+  });
 }
 
 export async function getMovieDetails(movieId: number) {
