@@ -232,7 +232,7 @@ export default async function Home({
             id="genre"
             name="genre"
             defaultValue={genre}
-            className="min-h-11 rounded-lg border border-zinc-300 bg-white px-4 text-sm text-zinc-950 outline-none focus:border-zinc-950 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50 dark:focus:border-zinc-300"
+            className="min-h-11 cursor-pointer rounded-lg border border-zinc-300 bg-white px-4 text-sm text-zinc-950 outline-none focus:border-zinc-950 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50 dark:focus:border-zinc-300"
           >
             <option value="">All Genres</option>
             {result.genres.map((genreOption) => (
@@ -255,13 +255,13 @@ export default async function Home({
             id="showDate"
             name="showDate"
             defaultValue={showDate}
-            className="min-h-11 rounded-lg border border-zinc-300 bg-white px-4 text-sm text-zinc-950 outline-none focus:border-zinc-950 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50 dark:focus:border-zinc-300"
+            className="min-h-11 cursor-pointer rounded-lg border border-zinc-300 bg-white px-4 text-sm text-zinc-950 outline-none focus:border-zinc-950 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50 dark:focus:border-zinc-300"
           />
         </div>
 
         <button
           type="submit"
-          className="min-h-11 rounded-lg bg-zinc-950 px-5 text-sm font-medium text-white dark:bg-zinc-50 dark:text-zinc-950"
+          className="min-h-11 rounded-lg bg-zinc-950 px-5 text-sm font-medium text-white dark:bg-zinc-50 dark:text-zinc-950 cursor-pointer"
         >
           Apply Filters
         </button>
