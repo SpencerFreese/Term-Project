@@ -1,19 +1,11 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getShowtimeDetails } from "@/lib/services/showtimeService";
+import { getSeatsForRoom } from "@/lib/services/seatService";
+import BookingExperience from "./BookingExperience";
+import BookingDescription from "./components/BookingDescription";
 
 export const dynamic = "force-dynamic";
-
-function formatDateTime(value: string | null) {
-  if (!value) {
-    return "Time TBD";
-  }
-
-  return new Intl.DateTimeFormat("en-US", {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(new Date(value));
-}
 
 export default async function BookingPrototypePage({
   params,
@@ -27,43 +19,20 @@ export default async function BookingPrototypePage({
     notFound();
   }
 
+  const seats = await getSeatsForRoom(showtime.theaterRoomId);
+
   return (
     <main className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-6 py-12">
       <Link
         href={`/movies/${showtime.movieId}`}
-        className="text-sm text-blue-600 underline"
+        className="inline-flex w-fit items-center justify-center rounded-full border border-zinc-700 bg-zinc-950 px-4 py-2 text-sm font-semibold text-zinc-200 transition hover:border-sky-500 hover:text-white"
       >
         ← Back to movie
       </Link>
 
-      <section className="space-y-3 rounded-2xl border p-6">
-        <p className="text-sm font-medium uppercase tracking-[0.3em] text-zinc-500">
-          Booking Prototype
-        </p>
+      <BookingDescription showtime={showtime} />
 
-        <h1 className="text-3xl font-bold">{showtime.movieTitle}</h1>
-
-        <dl className="grid gap-3 text-sm">
-          <div>
-            <dt className="font-semibold">Showtime</dt>
-            <dd>{formatDateTime(showtime.startTime)}</dd>
-          </div>
-
-          <div>
-            <dt className="font-semibold">Room</dt>
-            <dd>{showtime.roomName}</dd>
-          </div>
-
-          <div>
-            <dt className="font-semibold">Format</dt>
-            <dd>{showtime.formatType ?? "Standard"}</dd>
-          </div>
-        </dl>
-      </section>
-
-      <section className="rounded-2xl border border-dashed p-6 text-zinc-600 dark:text-zinc-400">
-        Seat selection, ticket quantities, and checkout will be implemented in a later sprint.
-      </section>
+      <BookingExperience seats={seats} />
     </main>
   );
 }
