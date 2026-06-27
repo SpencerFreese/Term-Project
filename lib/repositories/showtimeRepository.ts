@@ -15,7 +15,7 @@ export type Showtime = {
   status: "scheduled" | "cancelled" | "sold_out";
 };
 
-type ShowtimeRow = RowDataPacket & Showtime;
+export type ShowtimeRow = RowDataPacket & Showtime;
 
 export async function findShowtimesByMovieId(movieId: number) {
   return query<ShowtimeRow>(
