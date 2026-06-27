@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getShowtimeDetails } from "@/lib/services/showtimeService";
+import BookingPrototypeClient from "./BookingPrototypeClient";
 
 export const dynamic = "force-dynamic";
 
@@ -38,7 +39,7 @@ export default async function BookingPrototypePage({
 
       <section className="space-y-3 rounded-2xl border p-6">
         <p className="text-sm font-medium uppercase tracking-[0.3em] text-zinc-500">
-          Booking Prototype
+          Booking For: 
         </p>
 
         <h1 className="text-3xl font-bold">{showtime.movieTitle}</h1>
@@ -61,8 +62,17 @@ export default async function BookingPrototypePage({
         </dl>
       </section>
 
+      <section className="space-y-3 rounded-2xl border p-6">
+        <p className="text-sm font-medium uppercase tracking-[0.3em] text-zinc-500">
+          Seat Selection
+        </p>
+        <BookingPrototypeClient 
+        movieTitle={showtime.movieTitle} 
+        showtime={formatDateTime(showtime.startTime)} />
+      </section>
+      
       <section className="rounded-2xl border border-dashed p-6 text-zinc-600 dark:text-zinc-400">
-        Seat selection, ticket quantities, and checkout will be implemented in a later sprint.
+        Seat selection, ticket quantities, and checkout functionality will be implemented in a later sprint.
       </section>
     </main>
   );
