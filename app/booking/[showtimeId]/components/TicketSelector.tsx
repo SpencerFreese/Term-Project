@@ -48,7 +48,7 @@ export default function TicketSelector({
                 aria-label={`Decrease ${category.label} tickets`}
                 className="flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-300 text-lg font-semibold text-zinc-700 transition hover:border-sky-500 hover:text-sky-600 disabled:cursor-not-allowed disabled:opacity-40 dark:border-zinc-700 dark:text-zinc-300"
               >
-                −
+                -
               </button>
 
               <span className="min-w-8 text-center text-lg font-bold text-zinc-950 dark:text-zinc-50">

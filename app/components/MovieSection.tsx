@@ -1,7 +1,8 @@
 import Link from "next/link";
-import {  
-    type Movie,
-} from "@/lib/movies";
+import { type Movie } from "@/lib/movies";
+import { type ShowtimeRow } from "@/lib/repositories/showtimeRepository";
+
+type MovieWithShowtimes = Movie & { showtimes: ShowtimeRow[] };
 
 function formatReleaseDate(value: string | null) {
   if (!value) {
@@ -16,14 +17,22 @@ function formatReleaseDate(value: string | null) {
   }).format(new Date(`${value}T00:00:00Z`));
 }
 
-
+function formatShowtime(value: string | null) {
+  if (!value) return "Time TBD";
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  }).format(new Date(value));
+}
 
 export default function MovieSection({
   title,
   movies,
 }: {
   title: string;
-  movies: Movie[];
+  movies: MovieWithShowtimes[];
 }) {
   return (
     <section className="space-y-4">
@@ -101,6 +110,30 @@ export default function MovieSection({
                   <p className="text-xs text-zinc-500 dark:text-zinc-400">
                     Release: {formatReleaseDate(movie.releaseDate)}
                   </p>
+
+                  {movie.showtimes.length > 0 && (
+                    <div className="space-y-1.5">
+                      <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+                        Showtimes
+                      </p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {movie.showtimes.slice(0, 3).map((showtime) => (
+                          <Link
+                            key={showtime.showtimeId}
+                            href={`/booking/${showtime.showtimeId}`}
+                            className="rounded-full border border-zinc-200 bg-zinc-50 px-2.5 py-1 text-xs font-medium text-zinc-700 transition hover:border-sky-500 hover:bg-sky-50 hover:text-sky-600 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300 dark:hover:border-sky-500 dark:hover:bg-sky-950/30 dark:hover:text-sky-400"
+                          >
+                            {formatShowtime(showtime.startTime)}
+                          </Link>
+                        ))}
+                        {movie.showtimes.length > 3 && (
+                          <span className="rounded-full border border-zinc-200 bg-zinc-50 px-2.5 py-1 text-xs font-medium text-zinc-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-400">
+                            +{movie.showtimes.length - 3} more
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  )}
 
                   <Link
                     href={`/movies/${movie.movieId}`}

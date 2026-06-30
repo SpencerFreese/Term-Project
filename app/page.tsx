@@ -7,16 +7,19 @@ import {
   type Genre,
   type Movie,
 } from "@/lib/movies";
+import { findShowtimesByMovieId, type ShowtimeRow } from "@/lib/repositories/showtimeRepository";
 import ErrorPage from "./components/ErrorPage";
 import TitleBar from "./components/TitleBar";
 
 export const dynamic = "force-dynamic";
 
+export type MovieWithShowtimes = Movie & { showtimes: ShowtimeRow[] };
+
 export type HomeDataResult =
   | {
       ok: true;
-      currentlyPlaying: Movie[];
-      comingSoon: Movie[];
+      currentlyPlaying: MovieWithShowtimes[];
+      comingSoon: MovieWithShowtimes[];
       genres: Genre[];
     }
   | {
@@ -33,6 +36,13 @@ function normalizeGenres(value?: string | string[]) {
   return Array.isArray(value) ? value : [value];
 }
 
+
+async function attachShowtimes(movies: Movie[]): Promise<MovieWithShowtimes[]> {
+  const showtimes = await Promise.all(
+    movies.map((movie) => findShowtimesByMovieId(movie.movieId)),
+  );
+  return movies.map((movie, i) => ({ ...movie, showtimes: showtimes[i] }));
+}
 
 async function loadHomeData(
   searchTerm: string,
@@ -52,10 +62,16 @@ async function loadHomeData(
       getAllGenres(),
     ]);
 
+    const [currentlyPlayingWithShowtimes, comingSoonWithShowtimes] =
+      await Promise.all([
+        attachShowtimes(currentlyPlaying),
+        attachShowtimes(comingSoon),
+      ]);
+
     return {
       ok: true,
-      currentlyPlaying,
-      comingSoon,
+      currentlyPlaying: currentlyPlayingWithShowtimes,
+      comingSoon: comingSoonWithShowtimes,
       genres,
     };
   } catch (error) {
