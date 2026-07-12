@@ -18,6 +18,17 @@ export default function TitleBar({
         <p className="inline-flex rounded-full border border-sky-500/40 bg-sky-500/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.25em] text-sky-300">
           Term Project Cinema-E-Booking
         </p>
+        <nav className="mb-8 flex items-center justify-between">
+          <a href="/" className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">
+            Cinema E-Booking
+          </a>
+
+          <div className="flex gap-4 text-sm font-medium">
+            <a href="/login" className="text-sky-600 hover:underline">
+              Login / Account
+            </a>
+          </div>
+        </nav>
 
         <h1 className="text-4xl font-semibold tracking-tight text-zinc-950 dark:text-zinc-50 sm:text-5xl">
           Watch a movie Today
