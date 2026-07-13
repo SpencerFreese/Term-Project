@@ -113,3 +113,18 @@ export async function activateUser(userId: number) {
     [userId],
   );
 }
+
+export async function updateUserPassword(
+  userId: number,
+  passwordHash: string,
+) {
+  await execute(
+    `
+      UPDATE users
+      SET password_hash = ?
+      WHERE user_id = ?
+    `,
+    [passwordHash, userId],
+  );
+}
+

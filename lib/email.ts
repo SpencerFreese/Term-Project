@@ -77,3 +77,59 @@ export async function sendVerificationEmail(
     `,
   });
 }
+
+export async function sendPasswordResetEmail(
+  email: string,
+  firstName: string,
+  token: string,
+) {
+  const resetUrl =
+    `${getApplicationUrl()}/reset-password?token=${encodeURIComponent(token)}`;
+
+  const transporter = getTransporter();
+
+  if (!transporter) {
+    console.log("==============================================");
+    console.log(`Password reset email for: ${email}`);
+    console.log(`Password reset link: ${resetUrl}`);
+    console.log("==============================================");
+
+    return;
+  }
+
+  await transporter.sendMail({
+    from: process.env.EMAIL_FROM ?? process.env.SMTP_USER,
+    to: email,
+    subject: "Reset your Cinema E-Booking password",
+    text: [
+      `Hello ${firstName},`,
+      "",
+      "A password reset was requested for your account.",
+      "",
+      resetUrl,
+      "",
+      "This link expires in one hour.",
+      "",
+      "If you did not request this reset, you may ignore this email.",
+    ].join("\n"),
+    html: `
+      <h1>Reset your password</h1>
+
+      <p>Hello ${firstName},</p>
+
+      <p>A password reset was requested for your account.</p>
+
+      <p>
+        <a href="${resetUrl}">
+          Reset my password
+        </a>
+      </p>
+
+      <p>This link expires in one hour.</p>
+
+      <p>
+        If you did not request this reset, you may ignore this email.
+      </p>
+    `,
+  });
+}
