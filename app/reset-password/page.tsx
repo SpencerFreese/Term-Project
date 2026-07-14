@@ -2,7 +2,10 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Suspense, useState } from "react";
+import { Suspense, useState, useEffect } from "react";
+
+type TokenStatus =  "checking" | "valid" | "expired" | "error";
+
 
 export default function ResetPasswordPage() {
   return (
@@ -12,16 +15,77 @@ export default function ResetPasswordPage() {
   );
 }
 
+
+
+
+
+
 function ResetPasswordForm() {
   const searchParams = useSearchParams();
   const token = searchParams.get("token") ?? "";
 
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] =
-    useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
+
+
+  const [tokenStatus, setTokenStatus] = useState<TokenStatus>("checking");
+  
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function checkResetToken() {
+      if (!token) {
+        setTokenStatus("expired");
+        return;
+      }
+
+      try {
+        const response = await fetch(
+          `/api/auth/reset-password?token=${encodeURIComponent(token)}`,
+          {
+            method: "GET",
+            cache: "no-store",
+          },
+        );
+
+        const data = await response.json();
+
+        if (cancelled) {
+          return;
+        }
+
+        if (response.ok && data.valid === true) {
+          setTokenStatus("valid");
+          return;
+        }
+
+        if (
+          response.status === 400 ||
+          response.status === 410
+        ) {
+          setTokenStatus("expired");
+          return;
+        }
+
+        setTokenStatus("error");
+      } catch {
+        if (!cancelled) {
+          setTokenStatus("error");
+        }
+      }
+    }
+    void checkResetToken();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [token]);
+
+
 
   async function handleSubmit(
     event: React.FormEvent<HTMLFormElement>,
@@ -50,7 +114,14 @@ function ResetPasswordForm() {
 
       const data = await response.json();
 
+
       if (!response.ok) {
+        
+        if (response.status === 410) {
+          setTokenStatus("expired");
+          return;
+        }
+
         setError(
           data.error ?? "Password reset failed.",
         );
@@ -67,7 +138,24 @@ function ResetPasswordForm() {
     }
   }
 
-  if (!token) {
+
+  if (tokenStatus === "checking") {
+    return (
+      <main className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-6 py-12">
+          <div className="rounded-2xl border border-zinc-300 p-8 dark:border-zinc-800">
+            <h1>
+              Reset Password
+            </h1>
+            <p>
+              Checking reset link...
+            </p>
+        </div>
+      </main>
+    );
+  }
+
+
+  if (tokenStatus === "expired") {
     return (
       <main className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-6 py-12">
         <div className="rounded-2xl border border-zinc-300 p-8 dark:border-zinc-800">
@@ -76,7 +164,7 @@ function ResetPasswordForm() {
           </h1>
 
           <p className="mt-3 text-sm text-red-600">
-            This reset link does not contain a valid token.
+            This reset link has expired or is no longer valid
           </p>
 
           <Link
@@ -89,6 +177,23 @@ function ResetPasswordForm() {
       </main>
     );
   }
+
+ if (tokenStatus === "error") {
+  return (
+    <main className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-6 py-12">
+      <div className="rounded-2xl border border-zinc-300 p-8 dark:border-zinc-800">
+        <h1>
+          Unable to Check Reset Link
+        </h1>
+
+        <p>
+          Could not validate the reset link. Please try again.
+        </p>
+        
+      </div>
+    </main>
+  );
+}
 
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-6 py-12">

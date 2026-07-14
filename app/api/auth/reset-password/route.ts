@@ -6,6 +6,8 @@ import {
 } from "@/lib/repositories/passwordResetRepository";
 import { updateUserPassword } from "@/lib/repositories/userRepository";
 
+import crypto from "node:crypto";
+
 function validatePassword(password: string) {
   if (password.length < 8) {
     return "Password must contain at least 8 characters.";
@@ -29,6 +31,56 @@ function validatePassword(password: string) {
 
   return null;
 }
+
+
+export async function GET(request: Request) {
+  try {
+    const requestUrl = new URL(request.url);
+    const token = requestUrl.searchParams.get("token");
+
+    if (!token) {
+      return NextResponse.json(
+        {
+          valid: false,
+          error: "Reset link has expired or is invalid.",
+        },
+        { status: 410 },
+      );
+    }
+
+    const resetToken =
+      await findValidPasswordResetToken(token);
+
+    if (!resetToken) {
+      return NextResponse.json(
+        {
+          valid: false,
+          error: "Reset link has expired or is no longer valid.",
+        },
+        { status: 410 },
+      );
+    }
+
+    return NextResponse.json({
+      valid: true,
+    });
+  } catch (error) {
+    console.error("Reset-token validation error:", error);
+
+    return NextResponse.json(
+      {
+        valid: false,
+        error: "Unable to validate reset link.",
+      },
+      { status: 500 },
+    );
+  }
+}
+
+
+
+
+
 
 export async function POST(request: Request) {
   try {
@@ -84,7 +136,7 @@ export async function POST(request: Request) {
           error:
             "This password reset link is invalid or has expired.",
         },
-        { status: 400 },
+        { status: 410 },
       );
     }
 
