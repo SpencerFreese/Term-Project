@@ -13,7 +13,7 @@ This app uses Next.js App Router plus a local MySQL container for movie data.
 docker compose up -d
 ```
 
-The included `compose.yml` starts MySQL on port `3306` with:
+The included `compose.yml` starts MySQL on port `3307` with:
 
 - user: `root`
 - password: `term_project_root`
