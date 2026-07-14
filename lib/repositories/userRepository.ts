@@ -114,6 +114,53 @@ export async function activateUser(userId: number) {
   );
 }
 
+export type UpdateProfileInput = {
+  firstName: string;
+  lastName: string;
+  phoneNumber: string | null;
+  promoSubscribed: boolean;
+};
+
+export async function updateUserProfile(
+  userId: number,
+  input: UpdateProfileInput,
+) {
+  await execute(
+    `
+      UPDATE users
+      SET
+        first_name = ?,
+        last_name = ?,
+        phone_number = ?,
+        promo_subscribed = ?
+      WHERE user_id = ?
+    `,
+    [
+      input.firstName,
+      input.lastName,
+      input.phoneNumber,
+      input.promoSubscribed,
+      userId,
+    ],
+  );
+}
+
+export async function findPasswordHashById(userId: number) {
+  const rows = await query<
+    RowDataPacket & { passwordHash: string }
+  >(
+    `
+      SELECT password_hash AS passwordHash
+      FROM users
+      WHERE user_id = ?
+      LIMIT 1
+    `,
+    [userId],
+  );
+
+  return rows[0]?.passwordHash ?? null;
+}
+
 export async function updateUserPassword(
   userId: number,
   passwordHash: string,
@@ -127,4 +174,3 @@ export async function updateUserPassword(
     [passwordHash, userId],
   );
 }
-

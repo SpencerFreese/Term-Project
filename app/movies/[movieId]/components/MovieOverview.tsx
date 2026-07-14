@@ -1,6 +1,17 @@
 import { Movie } from "@/lib/movies"
+import FavoriteButton from "@/app/components/FavoriteButton";
 
-export default async function MovieOverview({movie, genres} : {movie: Movie; genres: string[]}) {
+export default async function MovieOverview({
+    movie,
+    genres,
+    isFavorited,
+    isAuthenticated,
+}: {
+    movie: Movie;
+    genres: string[];
+    isFavorited: boolean;
+    isAuthenticated: boolean;
+}) {
     return (
         <section className="overflow-hidden rounded-3xl border border-zinc-800 bg-zinc-950 shadow-2xl shadow-black/40">
             <div className="grid gap-0 lg:grid-cols-[320px_1fr]">
@@ -23,9 +34,18 @@ export default async function MovieOverview({movie, genres} : {movie: Movie; gen
                             Movie Details
                         </p>
 
-                        <h1 className="text-4xl font-black tracking-tight text-white sm:text-5xl">
-                            {movie.title}
-                        </h1>
+                        <div className="flex items-center gap-3">
+                            <h1 className="text-4xl font-black tracking-tight text-white sm:text-5xl">
+                                {movie.title}
+                            </h1>
+
+                            <FavoriteButton
+                                movieId={movie.movieId}
+                                initialFavorited={isFavorited}
+                                isAuthenticated={isAuthenticated}
+                                className="static"
+                            />
+                        </div>
 
                         <div className="flex flex-wrap gap-2">
                             <span className="rounded-full bg-sky-600 px-3 py-1 text-xs font-bold uppercase tracking-wide text-white">

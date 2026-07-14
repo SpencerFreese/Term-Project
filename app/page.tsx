@@ -8,6 +8,8 @@ import {
   type Movie,
 } from "@/lib/movies";
 import { findShowtimesByMovieId, type ShowtimeRow } from "@/lib/repositories/showtimeRepository";
+import { findFavoriteMovieIdsByUserId } from "@/lib/repositories/favoriteRepository";
+import { getSession } from "@/lib/auth";
 import ErrorPage from "./components/ErrorPage";
 import TitleBar from "./components/TitleBar";
 
@@ -97,11 +99,18 @@ export default async function Home({
   const selectedGenres = normalizeGenres(resolvedSearchParams.genre);
   const showDate = resolvedSearchParams.showDate?.trim() ?? "";
 
-  const result = await loadHomeData(searchTerm, selectedGenres, showDate);
+  const [result, session] = await Promise.all([
+    loadHomeData(searchTerm, selectedGenres, showDate),
+    getSession(),
+  ]);
 
   if (!result.ok) {
     return <ErrorPage result={result} />;
   }
+
+  const favoritedMovieIds = session
+    ? await findFavoriteMovieIdsByUserId(session.userId)
+    : [];
 
   return (
     <main className="mx-auto flex w-full max-w-6xl flex-1 flex-col gap-10 px-6 py-12 sm:px-10">
@@ -114,6 +123,8 @@ export default async function Home({
           : "Currently Playing"
         }
         movies={result.currentlyPlaying}
+        favoritedMovieIds={favoritedMovieIds}
+        isAuthenticated={Boolean(session)}
       />
 
       <MovieSection
@@ -123,6 +134,8 @@ export default async function Home({
           : "Coming Soon"
         }
         movies={result.comingSoon}
+        favoritedMovieIds={favoritedMovieIds}
+        isAuthenticated={Boolean(session)}
       />
     </main>
   );

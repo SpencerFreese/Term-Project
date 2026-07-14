@@ -1,8 +1,19 @@
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import { findUserProfileById } from "@/lib/repositories/userRepository";
+import { findAddressByUserId } from "@/lib/repositories/addressRepository";
+import { findCardsByUserId } from "@/lib/repositories/paymentCardRepository";
+import { findFavoriteMoviesByUserId } from "@/lib/repositories/favoriteRepository";
+import { lastFourDigits } from "@/lib/cardEncryption";
 import LogoutButton from "../components/LogoutButton";
 import Link from "next/link";
+import ProfileForm from "./components/ProfileForm";
+import PasswordForm from "./components/PasswordForm";
+import AddressForm from "./components/AddressForm";
+import PaymentCardsForm from "./components/PaymentCardsForm";
+import FavoritesList from "./components/FavoritesList";
+
+export const dynamic = "force-dynamic";
 
 export default async function ProfilePage() {
   const session = await getSession();
@@ -16,6 +27,21 @@ export default async function ProfilePage() {
   if (!user) {
     redirect("/login");
   }
+
+  const [address, cards, favorites] = await Promise.all([
+    findAddressByUserId(session.userId),
+    findCardsByUserId(session.userId),
+    findFavoriteMoviesByUserId(session.userId),
+  ]);
+
+  const maskedCards = cards.map((card) => ({
+    cardId: card.cardId,
+    cardholderName: card.cardholderName,
+    cardType: card.cardType,
+    expiryMonth: card.expiryMonth,
+    expiryYear: card.expiryYear,
+    lastFour: lastFourDigits(card.cardNumberEncrypted),
+  }));
 
   return (
     <main className="mx-auto flex w-full max-w-3xl flex-1 flex-col gap-8 px-6 py-12">
@@ -41,27 +67,33 @@ export default async function ProfilePage() {
         </div>
       </div>
 
-      <section className="rounded-2xl border border-zinc-300 p-6 dark:border-zinc-800">
-        <h2 className="mb-4 text-2xl font-semibold">Account Information</h2>
+      <ProfileForm
+        email={user.email}
+        firstName={user.firstName}
+        lastName={user.lastName}
+        phoneNumber={user.phoneNumber}
+        promoSubscribed={Boolean(user.promoSubscribed)}
+      />
 
-        <div className="space-y-3 text-sm">
-          <p>
-            <strong>Name:</strong> {user.firstName} {user.lastName}
-          </p>
+      <PasswordForm />
 
-          <p>
-            <strong>Email:</strong> {user.email}
-          </p>
+      <AddressForm
+        address={
+          address
+            ? {
+                street: address.street,
+                city: address.city,
+                state: address.state,
+                zipCode: address.zipCode,
+                country: address.country,
+              }
+            : null
+        }
+      />
 
-          <p>
-            <strong>Phone:</strong> {user.phoneNumber ?? "Not added"}
-          </p>
+      <PaymentCardsForm cards={maskedCards} />
 
-          <p>
-            <strong>Role:</strong> {user.role}
-          </p>
-        </div>
-      </section>
+      <FavoritesList favorites={favorites} />
     </main>
   );
 }

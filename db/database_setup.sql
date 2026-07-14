@@ -156,6 +156,22 @@ CREATE TABLE IF NOT EXISTS movie_genres (
 );
 
 -- ------------------------------------------------------------
+-- favorite_movies  (users can favorite movies while browsing)
+-- ------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS favorite_movies (
+    user_id    INT       NOT NULL,
+    movie_id   INT       NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (user_id, movie_id),
+    CONSTRAINT fk_favorite_user
+        FOREIGN KEY (user_id) REFERENCES users (user_id)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_favorite_movie
+        FOREIGN KEY (movie_id) REFERENCES movies (movie_id)
+        ON DELETE CASCADE
+);
+
+-- ------------------------------------------------------------
 --  theater rooms
 -- ------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS theater_rooms (

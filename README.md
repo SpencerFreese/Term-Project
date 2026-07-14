@@ -86,6 +86,7 @@ MYSQL_PASSWORD=term_project_root
 MYSQL_DATABASE=term_project
 
 AUTH_SECRET=replace_with_a_long_random_secret
+CARD_ENCRYPTION_KEY=replace_with_a_long_random_secret
 APP_URL=http://localhost:3000
 SMTP_HOST=
 SMTP_PORT=587

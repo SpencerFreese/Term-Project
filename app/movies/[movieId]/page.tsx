@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getMovieDetails } from "@/lib/movies";
+import { findFavoriteMovieIdsByUserId } from "@/lib/repositories/favoriteRepository";
+import { getSession } from "@/lib/auth";
 import MovieOverview from "./components/MovieOverview";
 import MovieTrailer from "./components/MovieTrailer";
 import Showtimes from "./components/Showtimes";
@@ -24,7 +26,11 @@ export default async function MovieDetailsPage({
   .map((genre) => genre.trim())
   .filter(Boolean);
 
-
+  const session = await getSession();
+  const favoritedMovieIds = session
+    ? await findFavoriteMovieIdsByUserId(session.userId)
+    : [];
+  const isFavorited = favoritedMovieIds.includes(movie.movieId);
 
 return (
   <main className="min-h-screen bg-black text-zinc-50">
@@ -36,7 +42,12 @@ return (
         ← Back to Movies
       </Link>
 
-      <MovieOverview movie={movie} genres={genres} />
+      <MovieOverview
+        movie={movie}
+        genres={genres}
+        isFavorited={isFavorited}
+        isAuthenticated={Boolean(session)}
+      />
 
       <MovieTrailer movie={movie} />
 
