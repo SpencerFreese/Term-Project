@@ -1,5 +1,6 @@
 import SearchBar from "./SearchBar";
 import { HomeDataResult } from "../page";
+import Link from "next/link";
 
 export default function TitleBar({
     searchTerm,
@@ -19,14 +20,14 @@ export default function TitleBar({
           Term Project Cinema-E-Booking
         </p>
         <nav className="mb-8 flex items-center justify-between">
-          <a href="/" className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">
+          <Link href="/" className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">
             Cinema E-Booking
-          </a>
+          </Link>
 
           <div className="flex gap-4 text-sm font-medium">
-            <a href="/login" className="text-sky-600 hover:underline">
+            <Link href="/login" className="text-sky-600 hover:underline">
               Login / Account
-            </a>
+            </Link>
           </div>
         </nav>
 

@@ -3,10 +3,10 @@ import {
   getAllGenres,
   getComingSoonMovies,
   getCurrentlyPlayingMovies,
-  getMovieSearchResults,
   type Genre,
   type Movie,
 } from "@/lib/movies";
+
 import { findShowtimesByMovieId, type ShowtimeRow } from "@/lib/repositories/showtimeRepository";
 import { findFavoriteMovieIdsByUserId } from "@/lib/repositories/favoriteRepository";
 import { getSession } from "@/lib/auth";

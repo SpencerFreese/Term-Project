@@ -6,7 +6,6 @@ import {
 } from "@/lib/repositories/passwordResetRepository";
 import { updateUserPassword } from "@/lib/repositories/userRepository";
 
-import crypto from "node:crypto";
 
 function validatePassword(password: string) {
   if (password.length < 8) {

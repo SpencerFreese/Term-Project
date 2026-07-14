@@ -1,41 +1,41 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
 export default function LoginPage() {
+  return (
+    <Suspense fallback={<LoginLoading />}>
+      <LoginForm />
+    </Suspense>
+  );
+}
+
+function LoginForm() {
   const router = useRouter();
+
+  const searchParams = useSearchParams();
+
+  const verification = searchParams.get("verification");
+
+  const initialNotice =
+    verification === "success"
+      ? "Your email has been confirmed. You may now log in."
+      : "";
+
+  const initialError =
+    verification === "invalid"
+      ? "This confirmation link is invalid or has expired."
+      : verification === "error"
+        ? "Your account could not be confirmed. Please try again."
+        : "";
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [notice, setNotice] = useState("");
+  const [error, setError] = useState(initialError);
+  const [notice, setNotice] = useState(initialNotice);
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    const verification = new URLSearchParams(
-      window.location.search,
-    ).get("verification");
-
-    if (verification === "success") {
-      setNotice(
-        "Your email has been confirmed. You may now log in.",
-      );
-    }
-
-    if (verification === "invalid") {
-      setError(
-        "This confirmation link is invalid or has expired.",
-      );
-    }
-
-    if (verification === "error") {
-      setError(
-        "Your account could not be confirmed. Please try again.",
-      );
-    }
-  }, []);
 
   async function handleSubmit(
     event: React.FormEvent<HTMLFormElement>,
@@ -86,7 +86,7 @@ export default function LoginPage() {
           href="/"
           className="mb-4 inline-flex w-fit items-center text-sm font-medium text-sky-600 hover:underline"
         >
-          ← Back to Home
+          Back to Home
         </Link>
 
 
@@ -168,24 +168,32 @@ export default function LoginPage() {
             </button>
           </div>
 
-          <a
+          <Link
             href="/forgot-password"
             className="block text-center text-sm text-sky-600 hover:underline"
           >
             Forgot your password?
-          </a>
+          </Link>
 
           <p className="text-center text-sm text-zinc-600 dark:text-zinc-400">
             Do not have an account?{" "}
-            <a
+            <Link
               href="/register"
               className="font-semibold text-sky-600 hover:underline"
             >
               Register
-            </a>
+            </Link>
           </p>
         </form>
       </div>
+    </main>
+  );
+}
+
+function LoginLoading() {
+  return (
+    <main className="mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-6 py-12">
+      <p>Loading login page...</p>
     </main>
   );
 }
