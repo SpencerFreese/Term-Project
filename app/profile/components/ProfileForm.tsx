@@ -86,6 +86,7 @@ export default function ProfileForm({
             <input
               id="firstName"
               name="firstName"
+              autoComplete="given-name"
               value={form.firstName}
               onChange={(event) =>
                 setForm((current) => ({
@@ -95,6 +96,7 @@ export default function ProfileForm({
               }
               required
               maxLength={50}
+              suppressHydrationWarning
               className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-zinc-950 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50"
             />
           </div>
@@ -110,6 +112,7 @@ export default function ProfileForm({
             <input
               id="lastName"
               name="lastName"
+              autoComplete="family-name"
               value={form.lastName}
               onChange={(event) =>
                 setForm((current) => ({
@@ -119,6 +122,7 @@ export default function ProfileForm({
               }
               required
               maxLength={50}
+              suppressHydrationWarning
               className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-zinc-950 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50"
             />
           </div>
@@ -134,6 +138,8 @@ export default function ProfileForm({
             value={email}
             disabled
             readOnly
+            autoComplete="email"
+            suppressHydrationWarning
             className="w-full cursor-not-allowed rounded-lg border border-zinc-300 bg-zinc-100 px-3 py-2 text-zinc-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-500"
           />
 
@@ -154,6 +160,7 @@ export default function ProfileForm({
             id="phoneNumber"
             name="phoneNumber"
             type="tel"
+            autoComplete="tel"
             value={form.phoneNumber}
             onChange={(event) =>
               setForm((current) => ({
@@ -162,12 +169,15 @@ export default function ProfileForm({
               }))
             }
             maxLength={20}
+            suppressHydrationWarning
             className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-zinc-950 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50"
           />
         </div>
 
         <label className="flex items-start gap-3 text-sm">
           <input
+            id="promoSubscribed"
+            name="promoSubscribed"
             type="checkbox"
             checked={form.promoSubscribed}
             onChange={(event) =>
@@ -176,6 +186,7 @@ export default function ProfileForm({
                 promoSubscribed: event.target.checked,
               }))
             }
+            suppressHydrationWarning
             className="mt-1"
           />
 
