@@ -13,7 +13,7 @@ This app uses Next.js App Router plus a local MySQL container for movie data.
 docker compose up -d
 ```
 
-The included `compose.yml` starts MySQL on port `3306` with:
+The included `compose.yml` starts MySQL on port `3307` with:
 
 - user: `root`
 - password: `term_project_root`
@@ -22,6 +22,7 @@ The included `compose.yml` starts MySQL on port `3306` with:
 ## Load Schema And Seed Data
 
 Run the schema file first:
+
 ```bash
 docker compose exec -T mysql mysql -uroot -pterm_project_root < db/database_setup.sql
 ```
@@ -92,6 +93,39 @@ SMTP_USER=
 SMTP_PASSWORD=
 EMAIL_FROM=
 ```
+
+## Poster Setup
+
+If seeded poster images are broken or missing, you can refresh them from TMDB with `scripts/fetch_posters.py`.
+
+Install the Python dependencies:
+
+```bash
+python -m pip install requests mysql-connector-python
+```
+
+Get an API key from https://www.themoviedb.org/settings/api
+
+Create a `tmdb.env` file in the project root:
+
+
+```bash
+TMDB_API_KEY=your_tmdb_api_key_here
+MYSQL_HOST=127.0.0.1
+MYSQL_PORT=3307
+MYSQL_USER=root
+MYSQL_PASSWORD=term_project_root
+MYSQL_DATABASE=term_project
+```
+
+Then run:
+
+```bash
+python scripts/fetch_posters.py
+```
+
+The script updates movie rows whose `poster_url` is empty or still points to the old Wikipedia URLs.
+
 ## Project Structure
 
 ```txt
