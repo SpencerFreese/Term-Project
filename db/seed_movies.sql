@@ -25,7 +25,7 @@ INSERT IGNORE INTO genres (name) VALUES
 -- Movies
 -- For sprint 1, we need 6 currently_playing, 4 coming_soon
 -- ------------------------------------------------------------
-INSERT INTO movies (title, description, poster_url, trailer_url, mpaa_rating, cast_list, runtime_minutes, release_date, status)
+INSERT IGNORE INTO movies (title, description, poster_url, trailer_url, mpaa_rating, cast_list, runtime_minutes, release_date, status)
 VALUES
 
 -- 1
@@ -142,43 +142,43 @@ VALUES
 -- Movie <-> Genre links
 -- The movie_genres table is what connects a movie to its genres since a movie can have multiple genres and a genre can belong to multiple movies.
 -- ------------------------------------------------------------
-INSERT INTO movie_genres (movie_id, genre_id)
+INSERT IGNORE INTO movie_genres (movie_id, genre_id)
 SELECT m.movie_id, g.genre_id FROM movies m, genres g
 WHERE m.title = 'Project Hail Mary'         AND g.name IN ('Sci-Fi', 'Adventure', 'Drama');
 
-INSERT INTO movie_genres (movie_id, genre_id)
+INSERT IGNORE INTO movie_genres (movie_id, genre_id)
 SELECT m.movie_id, g.genre_id FROM movies m, genres g
 WHERE m.title = 'Toy Story 5'               AND g.name IN ('Animation', 'Family', 'Comedy');
 
-INSERT INTO movie_genres (movie_id, genre_id)
+INSERT IGNORE INTO movie_genres (movie_id, genre_id)
 SELECT m.movie_id, g.genre_id FROM movies m, genres g
 WHERE m.title = 'Star Wars: The Mandalorian and Grogu' AND g.name IN ('Action', 'Adventure', 'Sci-Fi');
 
-INSERT INTO movie_genres (movie_id, genre_id)
+INSERT IGNORE INTO movie_genres (movie_id, genre_id)
 SELECT m.movie_id, g.genre_id FROM movies m, genres g
 WHERE m.title = 'Scream 7'                  AND g.name IN ('Horror', 'Mystery', 'Thriller');
 
-INSERT INTO movie_genres (movie_id, genre_id)
+INSERT IGNORE INTO movie_genres (movie_id, genre_id)
 SELECT m.movie_id, g.genre_id FROM movies m, genres g
 WHERE m.title = 'Mortal Kombat II'          AND g.name IN ('Action', 'Adventure');
 
-INSERT INTO movie_genres (movie_id, genre_id)
+INSERT IGNORE INTO movie_genres (movie_id, genre_id)
 SELECT m.movie_id, g.genre_id FROM movies m, genres g
 WHERE m.title = 'The Super Mario Galaxy Movie' AND g.name IN ('Animation', 'Adventure', 'Comedy', 'Family');
 
-INSERT INTO movie_genres (movie_id, genre_id)
+INSERT IGNORE INTO movie_genres (movie_id, genre_id)
 SELECT m.movie_id, g.genre_id FROM movies m, genres g
 WHERE m.title = 'Minions & Monsters'        AND g.name IN ('Animation', 'Comedy', 'Family');
 
-INSERT INTO movie_genres (movie_id, genre_id)
+INSERT IGNORE INTO movie_genres (movie_id, genre_id)
 SELECT m.movie_id, g.genre_id FROM movies m, genres g
 WHERE m.title = 'Spider-Man: Brand New Day' AND g.name IN ('Action', 'Adventure', 'Sci-Fi');
 
-INSERT INTO movie_genres (movie_id, genre_id)
+INSERT IGNORE INTO movie_genres (movie_id, genre_id)
 SELECT m.movie_id, g.genre_id FROM movies m, genres g
 WHERE m.title = 'The Hunger Games: Sunrise on the Reaping' AND g.name IN ('Action', 'Adventure', 'Drama');
 
-INSERT INTO movie_genres (movie_id, genre_id)
+INSERT IGNORE INTO movie_genres (movie_id, genre_id)
 SELECT m.movie_id, g.genre_id FROM movies m, genres g
 WHERE m.title = 'Avengers: Doomsday'        AND g.name IN ('Action', 'Adventure', 'Sci-Fi');
 
