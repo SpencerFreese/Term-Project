@@ -133,3 +133,46 @@ export async function sendPasswordResetEmail(
     `,
   });
 }
+
+export async function sendProfileUpdatedEmail(
+  email: string,
+  firstName: string,
+) {
+  const transporter = getTransporter();
+
+  if (!transporter) {
+    console.log("==============================================");
+    console.log(`Profile update notification for: ${email}`);
+    console.log("A change was made to this user's profile.");
+    console.log("==============================================");
+    return;
+  }
+
+  await transporter.sendMail({
+    from: process.env.EMAIL_FROM ?? process.env.SMTP_USER,
+    to: email,
+    subject: "Your Cinema E-Booking profile was updated",
+    text: [
+      `Hello ${firstName},`,
+      "",
+      "A change was made to your Cinema E-Booking profile.",
+      "",
+      "If you did not make this change, please reset your password immediately.",
+    ].join("\n"),
+    html: `
+      <h1>Your profile was updated</h1>
+
+      <p>Hello ${firstName},</p>
+
+      <p>
+        A change was made to your Cinema E-Booking profile.
+      </p>
+
+      <p>
+        If you did not make this change, please reset your password
+        immediately.
+      </p>
+    `,
+  });
+}
+  
