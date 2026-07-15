@@ -38,33 +38,33 @@ export default async function AdminPage() {
     
 
       <section className="grid gap-4 sm:grid-cols-2">
-        <a className="rounded-2xl border border-zinc-300 p-6 hover:bg-zinc-100 dark:border-zinc-800 dark:hover:bg-zinc-900" href="/admin/movies">
+        <div className="rounded-2xl border border-zinc-300 p-6 hover:bg-zinc-100 dark:border-zinc-800 dark:hover:bg-zinc-900" href="/admin/movies">
           <h2 className="text-xl font-semibold">Manage Movies</h2>
           <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
             Add, update, or remove movies.
           </p>
-        </a>
+        </div>
 
-        <a className="rounded-2xl border border-zinc-300 p-6 hover:bg-zinc-100 dark:border-zinc-800 dark:hover:bg-zinc-900" href="/admin/promotions">
+        <div className="rounded-2xl border border-zinc-300 p-6 hover:bg-zinc-100 dark:border-zinc-800 dark:hover:bg-zinc-900" href="/admin/promotions">
           <h2 className="text-xl font-semibold">Promotions</h2>
           <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
             Manage promotion codes and discounts.
           </p>
-        </a>
+        </div>
 
-        <a className="rounded-2xl border border-zinc-300 p-6 hover:bg-zinc-100 dark:border-zinc-800 dark:hover:bg-zinc-900" href="/admin/users">
+        <div className="rounded-2xl border border-zinc-300 p-6 hover:bg-zinc-100 dark:border-zinc-800 dark:hover:bg-zinc-900" href="/admin/users">
           <h2 className="text-xl font-semibold">Users</h2>
           <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
             View and manage user accounts.
           </p>
-        </a>
+        </div>
 
-        <a className="rounded-2xl border border-zinc-300 p-6 hover:bg-zinc-100 dark:border-zinc-800 dark:hover:bg-zinc-900" href="/admin/showtimes">
+        <div className="rounded-2xl border border-zinc-300 p-6 hover:bg-zinc-100 dark:border-zinc-800 dark:hover:bg-zinc-900" href="/admin/showtimes">
           <h2 className="text-xl font-semibold">Showtimes</h2>
           <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
             Manage movie showtimes.
           </p>
-        </a>
+        </div>
       </section>
     </main>
   );
