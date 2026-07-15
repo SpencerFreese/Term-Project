@@ -45,6 +45,16 @@ export async function sendVerificationEmail(
   }
 
   if (!transporter) {
+    console.log("SMTP is not configured. Email was not sent");
+    console.log("make sure env file is setup correctly");
+    
+     if(process.env.EMAIL_DEBUG_LINKS !=== "true"){
+      console.log("if you see this your EMAIL_DEBUG_LINKS is not true, please make sure your env file is set up correctly");
+      console.log("==============================================");
+      console.log(`Verification email for: ${email}`);
+      console.log(`Verification link: ${verificationUrl}`);
+      console.log("==============================================");
+    }
     return;
   }
 
@@ -103,6 +113,16 @@ export async function sendPasswordResetEmail(
 
 
   if (!transporter) {
+    console.log("SMTP is not configured. Email was not sent");
+    console.log("make sure env file is setup correctly");
+
+    if(process.env.EMAIL_DEBUG_LINKS !=== "true"){
+      console.log("if you see this your EMAIL_DEBUG_LINKS is not true, please make sure your env file is set up correctly");
+      console.log("==============================================");
+      console.log(`Password reset email for: ${email}`);
+      console.log(`Password reset link: ${resetUrl}`);
+      console.log("==============================================");
+    }
     return;
   }
 
