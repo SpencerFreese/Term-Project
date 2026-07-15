@@ -37,45 +37,50 @@ export async function sendVerificationEmail(
 
   const transporter = getTransporter();
 
-  if (!transporter) {
+  if (process.env.EMAIL_DEBUG_LINKS === "true") {
     console.log("==============================================");
     console.log(`Verification email for: ${email}`);
     console.log(`Verification link: ${verificationUrl}`);
     console.log("==============================================");
+  }
 
+  if (!transporter) {
     return;
   }
 
-  await transporter.sendMail({
-    from: process.env.EMAIL_FROM ?? process.env.SMTP_USER,
-    to: email,
-    subject: "Confirm your Cinema E-Booking account",
-    text: [
-      `Hello ${firstName},`,
-      "",
-      "Thank you for registering with Cinema E-Booking.",
-      "Use the following link to confirm your account:",
-      "",
-      verificationUrl,
-      "",
-      "This link expires in one hour.",
-    ].join("\n"),
-    html: `
-      <h1>Confirm your account</h1>
+  try {
+    await transporter.sendMail({
+      from: process.env.EMAIL_FROM ?? process.env.SMTP_USER,
+      to: email,
+      subject: "Confirm your Cinema E-Booking account",
+      text: [
+        `Hello ${firstName},`,
+        "",
+        "Thank you for registering with Cinema E-Booking.",
+        "Use the following link to confirm your account:",
+        "",
+        verificationUrl,
+        "",
+        "This link expires in one hour.",
+      ].join("\n"),
+      html: `
+        <h1>Confirm your account</h1>
+        <p>Hello ${firstName},</p>
+        <p>Thank you for registering with Cinema E-Booking.</p>
+        <p><a href="${verificationUrl}">Confirm my account</a></p>
+        <p>This link expires in one hour.</p>
+      `,
+    });
 
-      <p>Hello ${firstName},</p>
+    console.log(`Verification email sent to ${email}`);
+  } 
+  catch (error) {
+    console.error(`Verification email could not be sent to ${email}:`, error);
 
-      <p>Thank you for registering with Cinema E-Booking.</p>
-
-      <p>
-        <a href="${verificationUrl}">
-          Confirm my account
-        </a>
-      </p>
-
-      <p>This link expires in one hour.</p>
-    `,
-  });
+    if (process.env.EMAIL_DEBUG_LINKS !== "true") {
+      throw error;
+    }
+  }
 }
 
 export async function sendPasswordResetEmail(
@@ -88,12 +93,16 @@ export async function sendPasswordResetEmail(
 
   const transporter = getTransporter();
 
-  if (!transporter) {
+
+  if (process.env.EMAIL_DEBUG_LINKS === "true") {
     console.log("==============================================");
     console.log(`Password reset email for: ${email}`);
     console.log(`Password reset link: ${resetUrl}`);
     console.log("==============================================");
+  }
 
+
+  if (!transporter) {
     return;
   }
 
