@@ -26,14 +26,14 @@ Run the schema file first:
 ```bash
 docker compose exec -T mysql mysql -uroot -pterm_project_root < db/database_setup.sql
 ```
-
 Then seed the movie data:
+
 
 ```bash
 docker compose exec -T mysql mysql -uroot -pterm_project_root term_project < db/seed_movies.sql
 ```
 
-### Option 2: Windows PowerShell
+### Option 2: Windows PowerShell Fresh DB
 
 Run the schema file first:
 
@@ -42,10 +42,33 @@ Get-Content db/database_setup.sql | docker compose exec -T mysql mysql -uroot -p
 ```
 
 Then seed the movie data:
-
 ```powershell
 Get-Content db/seed_movies.sql | docker compose exec -T mysql mysql -uroot -pterm_project_root term_project
 ```
+
+Seed theater seats 
+```powershell
+Get-Content -Raw db/seed_seats.sql | docker exec -i term-project-mysql mysql -uroot -pterm_project_root term_project
+```
+
+Seed test customer/admin accounts (this will also remove all users from the db and repopulate it)
+```powershell
+Get-Content -Raw db/seed_users.sql | docker exec -i term-project-mysql mysql -uroot -pterm_project_root term_project
+```
+
+'''bash
+Admin:
+Email: admin@test.com
+Password: Password123!
+
+Customer 1 (blank):
+Email: customer@test.com
+Password: Password123!
+
+Customer 2 (filled):
+Email: profile@test.com
+Password: Password123!
+
 
 ## Start The App
 
@@ -73,6 +96,15 @@ MYSQL_PORT=3307
 MYSQL_USER=root
 MYSQL_PASSWORD=term_project_root
 MYSQL_DATABASE=term_project
+
+AUTH_SECRET=replace_with_a_long_random_secret
+CARD_ENCRYPTION_KEY=qwertyuiop
+APP_URL=http://localhost:3000
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=
+SMTP_PASSWORD=
+EMAIL_FROM=
 ```
 
 ## Poster Setup
@@ -110,20 +142,28 @@ The script updates movie rows whose `poster_url` is empty or still points to the
 ## Project Structure
 
 ```txt
-app/                         Next.js App Router pages and API routes
-app/page.tsx                 Homepage that renders movie data
-app/api/                     Backend API routes
-app/movies/[movieId]/        Movie details page route
-app/booking/[showtimeId]/    Booking prototype route
-db/                          Database SQL files
-db/database_setup.sql        Database schema creation
-db/seed_movies.sql           Movie, genre, theater room, seat, and showtime seed data
-lib/db.ts                    Server-only MySQL connection pool
-lib/repositories/            Database query layer
-lib/services/                Business logic layer
-lib/movies.ts                Compatibility wrapper for movie service functions
-compose.yml                  Local MySQL Docker container setup
-public/                      Static assets
+app/                                   Next.js App Router pages and API routes
+app/page.tsx                           Movie homepage
+app/login/page.tsx                     Login page
+app/register/page.tsx                  Customer registration page
+app/profile/page.tsx                   Customer profile page
+app/admin/page.tsx                     Administrator dashboard
+app/api/auth/login/route.ts            Login API
+app/api/auth/logout/route.ts           Logout API
+app/api/auth/register/route.ts         Registration API
+app/api/auth/verify-email/route.ts     Email-verification API
+app/movies/[movieId]/                  Movie-details route
+app/booking/[showtimeId]/              Booking route
+db/database_setup.sql                  Database schema
+db/seed_movies.sql                     Movie, genre, room, and showtime data
+db/seed_seats.sql                     Theater-seat data
+db/seed_users.sql                     Development customer and admin users
+lib/db.ts                             MySQL connection and query helpers
+lib/auth.ts                           Session-token functions
+lib/email.ts                          Email-delivery functions
+lib/repositories/                     Database query layer
+lib/services/                         Business-logic layer middleware.ts Route protection and role checking compose.yml Local MySQL Docker configuration
+public/                               Static assets
 ```
 
 ## Backend Structure
@@ -138,3 +178,5 @@ API Route -> Service -> Repository -> Database
 - Services contain business logic
 - Repositories contain SQL queries
 - `lib/db.ts` manages the MySQL connection pool
+- 'lib/auth.ts' creates and verifies login sessions
+- 'lib/email.ts' handles verification-email delivery

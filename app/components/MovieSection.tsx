@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { type Movie } from "@/lib/movies";
 import { type ShowtimeRow } from "@/lib/repositories/showtimeRepository";
+import FavoriteButton from "./FavoriteButton";
 
 type MovieWithShowtimes = Movie & { showtimes: ShowtimeRow[] };
 
@@ -30,9 +31,13 @@ function formatShowtime(value: string | null) {
 export default function MovieSection({
   title,
   movies,
+  favoritedMovieIds = [],
+  isAuthenticated = false,
 }: {
   title: string;
   movies: MovieWithShowtimes[];
+  favoritedMovieIds?: number[];
+  isAuthenticated?: boolean;
 }) {
   return (
     <section className="space-y-4">
@@ -55,7 +60,7 @@ export default function MovieSection({
           {movies.map((movie) => (
             <article
               key={movie.movieId}
-              className="group overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm transition duration-300 hover:-translate-y-2 hover:border-sky-500 hover:shadow-2xl dark:border-zinc-800 dark:bg-zinc-950"
+              className="group relative overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm transition duration-300 hover:-translate-y-2 hover:border-sky-500 hover:shadow-2xl dark:border-zinc-800 dark:bg-zinc-950"
             >
               <Link
                 href={`/movies/${movie.movieId}`}
@@ -82,6 +87,13 @@ export default function MovieSection({
                   </div>
                 </div>
               </Link>
+
+              <FavoriteButton
+                movieId={movie.movieId}
+                initialFavorited={favoritedMovieIds.includes(movie.movieId)}
+                isAuthenticated={isAuthenticated}
+                className="absolute right-3 top-3"
+              />
 
               <div className="flex min-h-72 flex-col justify-between gap-5 p-5">
                 <div className="space-y-3">

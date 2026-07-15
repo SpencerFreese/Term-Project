@@ -27,6 +27,46 @@ CREATE TABLE IF NOT EXISTS users (
     UNIQUE KEY uq_users_email (email)
 );
 
+
+-- ------------------------------------------------------------
+-- Email verification tokens
+-- ------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS email_verification_tokens (
+    verification_token_id INT NOT NULL AUTO_INCREMENT,
+    user_id                INT NOT NULL,
+    token_hash             CHAR(64) NOT NULL,
+    expires_at             DATETIME NOT NULL,
+    used_at                DATETIME NULL,
+    created_at              TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (verification_token_id),
+    UNIQUE KEY uq_email_verification_token_hash (token_hash),
+
+    CONSTRAINT fk_email_verification_user
+        FOREIGN KEY (user_id)
+        REFERENCES users (user_id)
+        ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS password_reset_tokens (
+    password_reset_token_id INT NOT NULL AUTO_INCREMENT,
+    user_id                  INT NOT NULL,
+    token_hash               CHAR(64) NOT NULL,
+    expires_at               DATETIME NOT NULL,
+    used_at                  DATETIME NULL,
+    created_at               TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (password_reset_token_id),
+    UNIQUE KEY uq_password_reset_token_hash (token_hash),
+
+    CONSTRAINT fk_password_reset_user
+        FOREIGN KEY (user_id)
+        REFERENCES users (user_id)
+        ON DELETE CASCADE
+);
+
+
+
 -- ------------------------------------------------------------
 -- user_addresses  (one per user, requirement 8)
 -- ------------------------------------------------------------
@@ -112,6 +152,22 @@ CREATE TABLE IF NOT EXISTS movie_genres (
         ON DELETE CASCADE,
     CONSTRAINT fk_movie_genres_genre
         FOREIGN KEY (genre_id) REFERENCES genres(genre_id)
+        ON DELETE CASCADE
+);
+
+-- ------------------------------------------------------------
+-- favorite_movies  (users can favorite movies while browsing)
+-- ------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS favorite_movies (
+    user_id    INT       NOT NULL,
+    movie_id   INT       NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (user_id, movie_id),
+    CONSTRAINT fk_favorite_user
+        FOREIGN KEY (user_id) REFERENCES users (user_id)
+        ON DELETE CASCADE,
+    CONSTRAINT fk_favorite_movie
+        FOREIGN KEY (movie_id) REFERENCES movies (movie_id)
         ON DELETE CASCADE
 );
 

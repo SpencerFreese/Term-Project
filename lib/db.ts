@@ -1,6 +1,10 @@
 import "server-only";
 
-import mysql, { type Pool, type RowDataPacket } from "mysql2/promise";
+import mysql, {
+  type Pool,
+  type ResultSetHeader,
+  type RowDataPacket,
+} from "mysql2/promise";
 
 type SqlValue = string | number | bigint | boolean | Date | null;
 
@@ -41,4 +45,16 @@ export async function query<T extends RowDataPacket>(
 ) {
   const [rows] = await pool.execute<T[]>(sql, values);
   return rows;
+}
+
+export async function execute(
+  sql: string,
+  values: SqlValue[] = [],
+) {
+  const [result] = await pool.execute<ResultSetHeader>(
+    sql,
+    values,
+  );
+
+  return result;
 }
