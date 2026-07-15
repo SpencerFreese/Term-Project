@@ -46,16 +46,28 @@ Then seed the movie data:
 Get-Content db/seed_movies.sql | docker compose exec -T mysql mysql -uroot -pterm_project_root term_project
 ```
 
-Seed theater seats
+Seed theater seats 
 ```powershell
 Get-Content -Raw db/seed_seats.sql | docker exec -i term-project-mysql mysql -uroot -pterm_project_root term_project
 ```
 
-Seed test customer/admin accounts
+Seed test customer/admin accounts (this will also remove all users from the db and repopulate it)
 ```powershell
 Get-Content -Raw db/seed_users.sql | docker exec -i term-project-mysql mysql -uroot -pterm_project_root term_project
 ```
 
+'''bash
+Admin:
+Email: admin@test.com
+Password: Password123!
+
+Customer 1 (blank):
+Email: customer@test.com
+Password: Password123!
+
+Customer 2 (filled):
+Email: profile@test.com
+Password: Password123!
 
 
 ## Start The App
@@ -86,9 +98,9 @@ MYSQL_PASSWORD=term_project_root
 MYSQL_DATABASE=term_project
 
 AUTH_SECRET=replace_with_a_long_random_secret
-CARD_ENCRYPTION_KEY=replace_with_a_long_random_secret
+CARD_ENCRYPTION_KEY=qwertyuiop
 APP_URL=http://localhost:3000
-SMTP_HOST=
+SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
 SMTP_USER=
 SMTP_PASSWORD=
