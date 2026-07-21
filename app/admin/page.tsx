@@ -24,47 +24,46 @@ export default async function AdminPage() {
           <h1 className="text-4xl font-bold">Welcome, Admin</h1>
         </div>
 
-      <div className="flex items-center gap-3">
-        <Link
-          href="/"
-          className="rounded-lg border border-zinc-300 px-4 py-2 text-sm font-semibold hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-900"
-        >
-          Home
-        </Link>
+        <div className="flex items-center gap-3">
+          <Link
+            href="/"
+            className="rounded-lg border border-zinc-300 px-4 py-2 text-sm font-semibold hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-900"
+          >
+            Home
+          </Link>
 
-        <LogoutButton />
+          <LogoutButton />
+        </div>
       </div>
-    </div>
-    
 
       <section className="grid gap-4 sm:grid-cols-2">
-        <div className="rounded-2xl border border-zinc-300 p-6 hover:bg-zinc-100 dark:border-zinc-800 dark:hover:bg-zinc-900" href="/admin/movies">
+        <Link href="/admin/movies/add" className="rounded-2xl border border-zinc-300 p-6 hover:bg-zinc-100 dark:border-zinc-800 dark:hover:bg-zinc-900">
           <h2 className="text-xl font-semibold">Manage Movies</h2>
           <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
             Add, update, or remove movies.
           </p>
-        </div>
+        </Link>
 
-        <div className="rounded-2xl border border-zinc-300 p-6 hover:bg-zinc-100 dark:border-zinc-800 dark:hover:bg-zinc-900" href="/admin/promotions">
+        <Link href="/admin/promotions" className="rounded-2xl border border-zinc-300 p-6 hover:bg-zinc-100 dark:border-zinc-800 dark:hover:bg-zinc-900">
           <h2 className="text-xl font-semibold">Promotions</h2>
           <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
             Manage promotion codes and discounts.
           </p>
-        </div>
+        </Link>
 
-        <div className="rounded-2xl border border-zinc-300 p-6 hover:bg-zinc-100 dark:border-zinc-800 dark:hover:bg-zinc-900" href="/admin/users">
+        <Link href="/admin/users" className="rounded-2xl border border-zinc-300 p-6 hover:bg-zinc-100 dark:border-zinc-800 dark:hover:bg-zinc-900">
           <h2 className="text-xl font-semibold">Users</h2>
           <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
             View and manage user accounts.
           </p>
-        </div>
+        </Link>
 
-        <div className="rounded-2xl border border-zinc-300 p-6 hover:bg-zinc-100 dark:border-zinc-800 dark:hover:bg-zinc-900" href="/admin/showtimes">
+        <Link href="/admin/showtimes" className="rounded-2xl border border-zinc-300 p-6 hover:bg-zinc-100 dark:border-zinc-800 dark:hover:bg-zinc-900">
           <h2 className="text-xl font-semibold">Showtimes</h2>
           <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
             Manage movie showtimes.
           </p>
-        </div>
+        </Link>
       </section>
     </main>
   );

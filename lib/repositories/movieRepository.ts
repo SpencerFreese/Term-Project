@@ -1,7 +1,7 @@
 import "server-only";
 
 import { type RowDataPacket } from "mysql2/promise";
-import { query } from "@/lib/db";
+import { query, execute } from "@/lib/db";
 
 export type MovieStatus = "currently_playing" | "coming_soon";
 
@@ -24,6 +24,19 @@ export type MovieFilters = {
   searchTerm?: string;
   genres?: string[];
   showDate?: string;
+};
+
+export type InsertMovieInput = {
+  title: string;
+  description: string | null;
+  posterUrl: string | null;
+  trailerUrl: string | null;
+  mpaaRating: string | null;
+  castList: string | null;
+  runtimeMinutes: number | null;
+  releaseDate: string | null;
+  status: MovieStatus;
+  genreIds: number[];
 };
 
 type MovieRow = RowDataPacket & Movie;
@@ -137,4 +150,50 @@ export async function searchMovies(searchTerm: string) {
 
 export async function findMoviesByGenre(genreName: string) {
   return findMovies({ genres: [genreName] });
+}
+
+export async function insertMovie(input: InsertMovieInput) {
+  const result = await execute(
+    `
+      INSERT INTO movies (
+        title,
+        description,
+        poster_url,
+        trailer_url,
+        mpaa_rating,
+        cast_list,
+        runtime_minutes,
+        release_date,
+        status
+      )
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `,
+    [
+      input.title,
+      input.description,
+      input.posterUrl,
+      input.trailerUrl,
+      input.mpaaRating,
+      input.castList,
+      input.runtimeMinutes,
+      input.releaseDate,
+      input.status,
+    ],
+  );
+
+  const movieId = result.insertId;
+
+  if (input.genreIds.length > 0) {
+    for (const genreId of input.genreIds) {
+      await execute(
+        `
+          INSERT IGNORE INTO movie_genres (movie_id, genre_id)
+          VALUES (?, ?)
+        `,
+        [movieId, genreId],
+      );
+    }
+  }
+
+  return movieId;
 }
