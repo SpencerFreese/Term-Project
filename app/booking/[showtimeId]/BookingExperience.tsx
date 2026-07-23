@@ -49,6 +49,9 @@ export default function BookingExperience({ seats }: { seats: Seat[] }) {
   // deselects it; otherwise the seat is only added if fewer seats are
   // selected than tickets purchased.
   function toggleSeat(seat: Seat) {
+    if (seat.availability !== "available") {
+    return;
+    }
     setSelectedSeatIds((current) => {
       const next = new Set(current);
 

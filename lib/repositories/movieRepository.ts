@@ -1,9 +1,15 @@
 import "server-only";
 
-import { type RowDataPacket } from "mysql2/promise";
-import { query, execute } from "@/lib/db";
+import { query, withTransaction} from "@/lib/db";
 
-export type MovieStatus = "currently_playing" | "coming_soon";
+import {
+  type PoolConnection,
+  type ResultSetHeader,
+  type RowDataPacket,
+} from "mysql2/promise";
+
+import type { MovieStatus} from "@/lib/movieForm";
+export type { MovieStatus} from "@/lib/movieForm";
 
 export type Movie = {
   movieId: number;
@@ -26,7 +32,7 @@ export type MovieFilters = {
   showDate?: string;
 };
 
-export type InsertMovieInput = {
+export type MovieWriteInput = {
   title: string;
   description: string | null;
   posterUrl: string | null;
@@ -152,48 +158,151 @@ export async function findMoviesByGenre(genreName: string) {
   return findMovies({ genres: [genreName] });
 }
 
-export async function insertMovie(input: InsertMovieInput) {
-  const result = await execute(
+async function replaceMovieGenres(
+  connection: PoolConnection,
+  movieId: number,
+  genreIds: number[],
+) {
+  await connection.execute(
     `
-      INSERT INTO movies (
-        title,
-        description,
-        poster_url,
-        trailer_url,
-        mpaa_rating,
-        cast_list,
-        runtime_minutes,
-        release_date,
-        status
-      )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      DELETE FROM movie_genres
+      WHERE movie_id = ?
     `,
-    [
-      input.title,
-      input.description,
-      input.posterUrl,
-      input.trailerUrl,
-      input.mpaaRating,
-      input.castList,
-      input.runtimeMinutes,
-      input.releaseDate,
-      input.status,
-    ],
+    [movieId],
   );
 
-  const movieId = result.insertId;
-
-  if (input.genreIds.length > 0) {
-    for (const genreId of input.genreIds) {
-      await execute(
-        `
-          INSERT IGNORE INTO movie_genres (movie_id, genre_id)
-          VALUES (?, ?)
-        `,
-        [movieId, genreId],
-      );
-    }
+  for (const genreId of genreIds) {
+    await connection.execute(
+      `
+        INSERT INTO movie_genres (
+          movie_id,
+          genre_id
+        )
+        VALUES (?, ?)
+      `,
+      [
+        movieId,
+        genreId,
+      ],
+    );
   }
+}
 
-  return movieId;
+export async function findMovieGenreIds(
+  movieId: number,
+) {
+  type GenreIdRow =
+    RowDataPacket & {
+      genreId: number;
+    };
+
+  const rows =
+    await query<GenreIdRow>(
+      `
+        SELECT
+          genre_id AS genreId
+        FROM movie_genres
+        WHERE movie_id = ?
+        ORDER BY genre_id ASC
+      `,
+      [movieId],
+    );
+
+  return rows.map(
+    (row) => row.genreId,
+  );
+}
+
+export async function insertMovie(
+  input: MovieWriteInput,
+) {
+  return withTransaction(
+    async (connection) => {
+      const [result] =
+        await connection.execute<ResultSetHeader>(
+          `
+            INSERT INTO movies (
+              title,
+              description,
+              poster_url,
+              trailer_url,
+              mpaa_rating,
+              cast_list,
+              runtime_minutes,
+              release_date,
+              status
+            )
+            VALUES (
+              ?, ?, ?, ?, ?, ?, ?, ?, ?
+            )
+          `,
+          [
+            input.title,
+            input.description,
+            input.posterUrl,
+            input.trailerUrl,
+            input.mpaaRating,
+            input.castList,
+            input.runtimeMinutes,
+            input.releaseDate,
+            input.status,
+          ],
+        );
+
+      const movieId =
+        result.insertId;
+
+      await replaceMovieGenres(
+        connection,
+        movieId,
+        input.genreIds,
+      );
+
+      return movieId;
+    },
+  );
+}
+
+export async function updateMovie(
+  movieId: number,
+  input: MovieWriteInput,
+) {
+  await withTransaction(
+    async (connection) => {
+      await connection.execute<ResultSetHeader>(
+        `
+          UPDATE movies
+          SET
+            title = ?,
+            description = ?,
+            poster_url = ?,
+            trailer_url = ?,
+            mpaa_rating = ?,
+            cast_list = ?,
+            runtime_minutes = ?,
+            release_date = ?,
+            status = ?
+          WHERE movie_id = ?
+        `,
+        [
+          input.title,
+          input.description,
+          input.posterUrl,
+          input.trailerUrl,
+          input.mpaaRating,
+          input.castList,
+          input.runtimeMinutes,
+          input.releaseDate,
+          input.status,
+          movieId,
+        ],
+      );
+
+      await replaceMovieGenres(
+        connection,
+        movieId,
+        input.genreIds,
+      );
+    },
+  );
 }

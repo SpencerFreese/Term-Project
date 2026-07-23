@@ -1,11 +1,12 @@
 import "server-only";
 
-import { findSeatsByRoomId } from "@/lib/repositories/seatRepository";
+import { findSeatsByShowtimeId  } from "@/lib/repositories/seatRepository";
 
-export async function getSeatsForRoom(theaterRoomId: number) {
-  if (!Number.isInteger(theaterRoomId) || theaterRoomId <= 0) {
-    return [];
+
+export async function getSeatsForShowtime(showtimeId: number): Promise<Seat[]> {
+  if (!Number.isInteger(showtimeId) ||showtimeId <= 0) {
+    throw new Error("Invalid showtime ID.");
   }
-
-  return findSeatsByRoomId(theaterRoomId);
+  
+  return findSeatsByShowtimeId(showtimeId);
 }

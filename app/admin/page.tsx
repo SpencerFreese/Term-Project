@@ -37,7 +37,7 @@ export default async function AdminPage() {
       </div>
 
       <section className="grid gap-4 sm:grid-cols-2">
-        <Link href="/admin/movies/add" className="rounded-2xl border border-zinc-300 p-6 hover:bg-zinc-100 dark:border-zinc-800 dark:hover:bg-zinc-900">
+        <Link href="/admin/movies" className="rounded-2xl border border-zinc-300 p-6 hover:bg-zinc-100 dark:border-zinc-800 dark:hover:bg-zinc-900">
           <h2 className="text-xl font-semibold">Manage Movies</h2>
           <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
             Add, update, or remove movies.

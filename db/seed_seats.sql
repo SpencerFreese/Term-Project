@@ -6,7 +6,11 @@
 -- ============================================================
 
 USE term_project; 
-
+-- Must be deleted first because it references seats
+DELETE FROM showtime_seats;
+DELETE FROM showtime_seats;
+-- Remove the old physical seat layout
+DELETE FROM seats;
 -- ------------------------------------------------------------
 -- Theater Room 1 (Standard, 5x8)
 -- ------------------------------------------------------------
@@ -63,3 +67,37 @@ INSERT INTO seats (theater_room_id, row_label, seat_number, seat_type) VALUES
 (2, 'F', 4, 'standard'), (2, 'F', 5, 'standard'), (2, 'F', 6, 'standard'),
 (2, 'F', 7, 'standard'), (2, 'F', 8, 'standard'), (2, 'F', 9, 'standard'),
 (2, 'F', 10, 'wheelchair');
+
+
+
+-- ------------------------------------------------------------
+-- Theater Room 3 (IMAX, 5x10)
+-- ------------------------------------------------------------
+
+INSERT INTO seats (
+    theater_room_id, row_label, seat_number, seat_type)
+VALUES
+(3, 'A', 1, 'standard'), (3, 'A', 2, 'standard'), (3, 'A', 3, 'standard'), 
+(3, 'A', 4, 'standard'), (3, 'A', 5, 'standard'), (3, 'A', 6, 'standard'), 
+(3, 'A', 7, 'standard'), (3, 'A', 8, 'standard'), (3, 'A', 9, 'standard'), 
+(3, 'A', 10, 'wheelchair'),
+
+(3, 'B', 1, 'standard'), (3, 'B', 2, 'standard'), (3, 'B', 3, 'standard'),
+(3, 'B', 4, 'standard'), (3, 'B', 5, 'standard'), (3, 'B', 6, 'standard'),
+(3, 'B', 7, 'standard'), (3, 'B', 8, 'standard'), (3, 'B', 9, 'standard'),
+(3, 'B', 10, 'wheelchair'),
+
+(3, 'C', 1, 'standard'), (3, 'C', 2, 'standard'), (3, 'C', 3, 'standard'),
+(3, 'C', 4, 'standard'), (3, 'C', 5, 'standard'), (3, 'C', 6, 'standard'),
+(3, 'C', 7, 'standard'), (3, 'C', 8, 'standard'), (3, 'C', 9, 'standard'),
+(3, 'C', 10, 'wheelchair'),
+
+(3, 'D', 1, 'standard'), (3, 'D', 2, 'standard'), (3, 'D', 3, 'standard'),
+(3, 'D', 4, 'standard'), (3, 'D', 5, 'standard'), (3, 'D', 6, 'standard'),
+(3, 'D', 7, 'standard'), (3, 'D', 8, 'standard'), (3, 'D', 9, 'standard'),
+(3, 'D', 10, 'wheelchair'),
+
+(3, 'E', 1, 'standard'), (3, 'E', 2, 'standard'), (3, 'E', 3, 'standard'),
+(3, 'E', 4, 'standard'), (3, 'E', 5, 'standard'), (3, 'E', 6, 'standard'),
+(3, 'E', 7, 'standard'), (3, 'E', 8, 'standard'), (3, 'E', 9, 'standard'),
+(3, 'E', 10, 'wheelchair');

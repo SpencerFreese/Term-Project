@@ -50,23 +50,56 @@ export default function SeatMap({
                     const isSelected = selectedSeatIds.has(seat.seatId);
                     const isWheelchair = seat.seatType === "wheelchair";
 
+                    const isBooked =
+                      seat.availability === "booked";
+
+                    const isReserved =
+                      seat.availability === "reserved";
+
+                    const isUnavailable =
+                      seat.availability !== "available";
+
+                    let seatClass =
+                      "flex h-8 w-8 shrink-0 items-center justify-center rounded-md border text-[10px] font-semibold transition";
+
+                    if (isBooked) {
+                      seatClass +=
+                        " cursor-not-allowed border-zinc-500 bg-zinc-700 text-zinc-300 opacity-70";
+                    } else if (isReserved) {
+                      seatClass +=
+                        " cursor-not-allowed border-amber-500 bg-amber-500/25 text-amber-700 opacity-70 dark:text-amber-300";
+                    } else if (isSelected) {
+                      seatClass +=
+                        " border-sky-500 bg-sky-600 text-white";
+                    } else if (isWheelchair) {
+                      seatClass +=
+                        " border-emerald-400 bg-emerald-50 text-emerald-700 hover:border-emerald-500 dark:border-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300";
+                    } else {
+                      seatClass +=
+                        " border-zinc-300 bg-zinc-50 text-zinc-600 hover:border-sky-500 hover:text-sky-600 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300";
+                    }
+
+                    const availabilityLabel = isBooked
+                      ? "booked"
+                      : isReserved
+                        ? "reserved"
+                        : "available";
+
+
                     return (
                       <button
                         key={seat.seatId}
                         type="button"
+                        disabled={isUnavailable}
                         onClick={() => onToggleSeat(seat)}
                         aria-pressed={isSelected}
-                        aria-label={`Seat ${rowLabel}${seat.seatNumber}${
-                          isWheelchair ? " (wheelchair accessible)" : ""
+                        aria-label={`Seat ${rowLabel}${seat.seatNumber}, ${availabilityLabel}${
+                          isWheelchair
+                            ? ", wheelchair accessible"
+                            : ""
                         }`}
-                        className={[
-                          "flex h-8 w-8 shrink-0 items-center justify-center rounded-md border text-[10px] font-semibold transition",
-                          isSelected
-                            ? "border-sky-500 bg-sky-600 text-white"
-                            : isWheelchair
-                              ? "border-emerald-400 bg-emerald-50 text-emerald-700 hover:border-emerald-500 dark:border-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300"
-                              : "border-zinc-300 bg-zinc-50 text-zinc-600 hover:border-sky-500 hover:text-sky-600 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300",
-                        ].join(" ")}
+                        className={seatClass}
+                        title={`Seat ${rowLabel}${seat.seatNumber}: ${availabilityLabel}`}
                       >
                         {seat.seatNumber}
                       </button>
@@ -77,16 +110,28 @@ export default function SeatMap({
             ))}
           </div>
 
-          {/* seat type key */}
+          {/* Seat status key */}
           <div className="flex flex-wrap gap-4 pt-2 text-xs text-zinc-600 dark:text-zinc-400">
             <span className="flex items-center gap-2">
               <span className="h-3 w-3 rounded-sm border border-zinc-300 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900" />
               Available
             </span>
+
             <span className="flex items-center gap-2">
               <span className="h-3 w-3 rounded-sm border border-sky-500 bg-sky-600" />
               Selected
             </span>
+
+            <span className="flex items-center gap-2">
+              <span className="h-3 w-3 rounded-sm border border-amber-500 bg-amber-500/25" />
+              Reserved
+            </span>
+
+            <span className="flex items-center gap-2">
+              <span className="h-3 w-3 rounded-sm border border-zinc-500 bg-zinc-700" />
+              Booked
+            </span>
+
             <span className="flex items-center gap-2">
               <span className="h-3 w-3 rounded-sm border border-emerald-400 bg-emerald-50 dark:border-emerald-700 dark:bg-emerald-950/40" />
               Wheelchair Accessible

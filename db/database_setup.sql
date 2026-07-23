@@ -184,6 +184,7 @@ CREATE TABLE IF NOT EXISTS theater_rooms (
     UNIQUE KEY uq_room_name (room_name)
 );
 
+
 -- ------------------------------------------------------------
 --  seats (seats per thearter room)
 -- ------------------------------------------------------------
@@ -223,5 +224,33 @@ CREATE TABLE IF NOT EXISTS showtimes (
         ON DELETE CASCADE,
     CONSTRAINT fk_showtime_theater_room
         FOREIGN KEY (theater_room_id) REFERENCES theater_rooms(theater_room_id)
+        ON DELETE CASCADE
+);
+
+CREATE TABLE showtime_seats (
+    showtime_id INT NOT NULL,
+    seat_id INT NOT NULL,
+
+    status ENUM(
+        'reserved',
+        'booked'
+    ) NOT NULL DEFAULT 'booked',
+
+    reserved_at DATETIME NULL,
+    reserved_until DATETIME NULL,
+
+    PRIMARY KEY (
+        showtime_id,
+        seat_id
+    ),
+
+    CONSTRAINT fk_showtime_seats_showtime
+        FOREIGN KEY (showtime_id)
+        REFERENCES showtimes(showtime_id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_showtime_seats_seat
+        FOREIGN KEY (seat_id)
+        REFERENCES seats(seat_id)
         ON DELETE CASCADE
 );

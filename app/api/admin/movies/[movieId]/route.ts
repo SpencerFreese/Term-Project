@@ -1,10 +1,11 @@
-import {NextResponse} from "next/server";
+import {
+  NextResponse,
+} from "next/server";
 import { getSession } from "@/lib/auth";
 import {
   AdminMovieValidationError,
-  createAdminMovie,
+  updateAdminMovie,
 } from "@/lib/services/adminMovieService";
-
 
 function isDuplicateEntryError(
   error: unknown,
@@ -17,8 +18,16 @@ function isDuplicateEntryError(
   );
 }
 
-export async function POST(
+export async function PUT(
   request: Request,
+
+  {
+    params,
+  }: {
+    params: Promise<{
+      movieId: string;
+    }>;
+  },
 ) {
   const session =
     await getSession();
@@ -38,22 +47,24 @@ export async function POST(
   }
 
   try {
+    const {
+      movieId: movieIdText,
+    } = await params;
+
+    const movieId =
+      Number(movieIdText);
+
     const body =
       await request.json();
 
-    const movieId =
-      await createAdminMovie(
-        body,
-      );
-
-    return NextResponse.json(
-      {
-        movieId,
-      },
-      {
-        status: 201,
-      },
+    await updateAdminMovie(
+      movieId,
+      body,
     );
+
+    return NextResponse.json({
+      movieId,
+    });
   } catch (error) {
     if (
       error instanceof
@@ -87,14 +98,14 @@ export async function POST(
     }
 
     console.error(
-      "Failed to create movie:",
+      "Failed to update movie:",
       error,
     );
 
     return NextResponse.json(
       {
         error:
-          "Unable to add the movie. Please try again.",
+          "Unable to update the movie. Please try again.",
       },
       {
         status: 500,
