@@ -31,9 +31,27 @@ export async function sendVerificationEmail(
   email: string,
   firstName: string,
   token: string,
+  returnTo: string | null = null,
 ) {
-  const verificationUrl =
-    `${getApplicationUrl()}/api/auth/verify-email?token=${encodeURIComponent(token)}`;
+  const verificationUrlObject =
+  new URL(
+    "/api/auth/verify-email",
+    getApplicationUrl(),
+  );
+
+verificationUrlObject.searchParams.set(
+  "token",
+  token,
+);
+
+if (returnTo) {
+  verificationUrlObject.searchParams.set(
+    "returnTo",
+    returnTo,
+  );
+}
+
+const verificationUrl =verificationUrlObject.toString();
 
   const transporter = getTransporter();
 

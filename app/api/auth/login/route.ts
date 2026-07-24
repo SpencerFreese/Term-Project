@@ -7,9 +7,23 @@ import {
   sessionCookieOptions,
 } from "@/lib/auth";
 
+function getSafeReturnTo(
+  value: unknown,
+): string | null {
+  if (
+    typeof value !== "string" ||
+    !value.startsWith("/") ||
+    value.startsWith("//")
+  ) {
+    return null;
+  }
+
+  return value;
+}
+
 export async function POST(request: Request) {
   try {
-    const { email, password } = await request.json();
+    const { email, password, returnTo} = await request.json();
 
     if (!email || !password) {
       return NextResponse.json(
@@ -49,7 +63,7 @@ export async function POST(request: Request) {
       role: user.role,
     });
 
-    const redirectTo = user.role === "admin" ? "/admin" : "/profile";
+    const redirectTo = user.role === "admin" ? "/admin": getSafeReturnTo(returnTo) ?? "/profile";
 
     const response = NextResponse.json({
       message: "Login successful.",

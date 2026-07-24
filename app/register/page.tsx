@@ -1,9 +1,29 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 
 export default function RegisterPage() {
+  return (
+    <Suspense fallback={<RegisterLoading />}>
+      <RegisterForm />
+    </Suspense>
+  );
+}
+
+function RegisterForm() {
+  const searchParams = useSearchParams();
+
+  const returnTo =
+    searchParams.get("returnTo") ?? "";
+
+  const loginHref = returnTo
+    ? `/login?returnTo=${encodeURIComponent(
+        returnTo,
+      )}`
+    : "/login";
+
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
@@ -44,7 +64,10 @@ export default function RegisterPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(form),
+        body: JSON.stringify({
+          ...form,
+          returnTo,
+        }),
       });
 
 const responseText = await response.text();
@@ -237,7 +260,7 @@ setSuccess(
         <p className="mt-6 text-center text-sm text-zinc-600 dark:text-zinc-400">
           Already registered?{" "}
           <Link
-            href="/login"
+            href={loginHref}
             className="font-semibold text-sky-600 hover:underline"
           >
             Log in
@@ -305,5 +328,13 @@ function FormInput({
         </p>
       )}
     </div>
+  );
+}
+
+function RegisterLoading() {
+  return (
+    <main className="mx-auto flex w-full max-w-xl flex-1 flex-col justify-center px-6 py-12">
+      <p>Loading registration page...</p>
+    </main>
   );
 }

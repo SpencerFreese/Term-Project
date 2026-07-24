@@ -5,6 +5,8 @@ import { getSeatsForShowtime } from "@/lib/services/seatService";
 import BookingExperience from "./BookingExperience";
 import BookingDescription from "./components/BookingDescription";
 
+import { getSession } from "@/lib/auth";
+
 export const dynamic = "force-dynamic";
 
 export default async function BookingPrototypePage({params,}: {params: Promise<{ showtimeId: string }>;}) {
@@ -15,13 +17,20 @@ export default async function BookingPrototypePage({params,}: {params: Promise<{
     notFound();
   }
 
+  const session = await getSession();
+
+  const userId =
+    session?.role === "customer"
+      ? session.userId
+      : null;
+
   const showtime = await getShowtimeDetails(parsedShowtimeId);
 
   if (!showtime) {
     notFound();
   }
 
-  const seats = await getSeatsForShowtime(parsedShowtimeId);
+  const seats = await getSeatsForShowtime(parsedShowtimeId, userId);
 
   return (
     <main className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-6 py-12">
@@ -34,7 +43,10 @@ export default async function BookingPrototypePage({params,}: {params: Promise<{
 
       <BookingDescription showtime={showtime} />
 
-      <BookingExperience seats={seats} />
+      <BookingExperience
+        seats={seats}
+        showtimeId={parsedShowtimeId}
+      />
     </main>
   );
 }

@@ -1,13 +1,25 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import type { Seat } from "@/lib/repositories/seatRepository";
 import TicketSelector from "./components/TicketSelector";
 import SeatMap from "./components/SeatMap";
 import OrderSummary from "./components/OrderSummary";
 import { TICKET_CATEGORIES, type TicketCategoryKey } from "./components/ticketCategories";
+import { useRouter } from "next/navigation";
 
-export default function BookingExperience({ seats }: { seats: Seat[] }) {
+export default function BookingExperience({ seats, showtimeId}: {
+  seats: Seat[];
+  showtimeId: number;
+}) {
+
+  const router = useRouter();
+
+  const [checkoutLoading, setCheckoutLoading] =
+    useState(false);
+
+  const [checkoutError, setCheckoutError] =
+    useState("");
   const [quantities, setQuantities] = useState<Record<TicketCategoryKey, number>>({
     adult: 0,
     senior: 0,
@@ -16,10 +28,14 @@ export default function BookingExperience({ seats }: { seats: Seat[] }) {
   const [selectedSeatIds, setSelectedSeatIds] = useState<Set<number>>(new Set());
 
   const totalTickets = quantities.adult + quantities.senior + quantities.child;
+
+  const canCheckout =totalTickets > 0 && selectedSeatIds.size === totalTickets;
+
   const totalPrice = TICKET_CATEGORIES.reduce(
     (sum, category) => sum + quantities[category.key] * category.price,
     0,
   );
+
 
   // Groups seats by row label so the seat map can render one row at a time,
   // sorted alphabetically (e.g. A, B, C...) regardless of the order seats
@@ -49,25 +65,96 @@ export default function BookingExperience({ seats }: { seats: Seat[] }) {
   // deselects it; otherwise the seat is only added if fewer seats are
   // selected than tickets purchased.
   function toggleSeat(seat: Seat) {
-    if (seat.availability !== "available") {
-    return;
+    const isSelectable =
+      seat.availability === "available" ||
+      seat.availability === "reserved_by_you";
+
+    if (!isSelectable || totalTickets === 0) {
+      return;
     }
-    setSelectedSeatIds((current) => {
-      const next = new Set(current);
 
-      if (next.has(seat.seatId)) {
-        next.delete(seat.seatId);
-        return next;
-      }
+  setSelectedSeatIds((current) => {
+    const next = new Set(current);
 
-      if (totalTickets > 0 && next.size >= totalTickets) {
-        return next;
-      }
-
-      next.add(seat.seatId);
+    if (next.has(seat.seatId)) {
+      next.delete(seat.seatId);
       return next;
-    });
+    }
+
+    if (next.size >= totalTickets) {
+      return next;
+    }
+
+    next.add(seat.seatId);
+    return next;
+  });
+}
+
+  useEffect(() => {
+  setSelectedSeatIds((current) => {
+    if (current.size <= totalTickets) {
+      return current;
+    }
+
+    return new Set(
+      Array.from(current).slice(0, totalTickets),
+    );
+  });
+}, [totalTickets]);
+
+  async function beginCheckout() {
+  if (!canCheckout || checkoutLoading) {
+    return;
   }
+
+  setCheckoutLoading(true);
+  setCheckoutError("");
+
+  try {
+    const response = await fetch(
+      "/api/checkout/drafts",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type":
+            "application/json",
+        },
+        body: JSON.stringify({
+          showtimeId,
+          quantities,
+          seatIds: Array.from(
+            selectedSeatIds,
+          ),
+        }),
+      },
+    );
+
+    const data = (await response.json()) as {
+      checkoutUrl?: string;
+      error?: string;
+    };
+
+    if (
+      !response.ok ||
+      !data.checkoutUrl
+    ) {
+      throw new Error(
+        data.error ??
+          "Unable to begin checkout.",
+      );
+    }
+
+    router.push(data.checkoutUrl);
+  } catch (error) {
+    setCheckoutError(
+      error instanceof Error
+        ? error.message
+        : "Unable to begin checkout.",
+    );
+  } finally {
+    setCheckoutLoading(false);
+  }
+}
 
   return (
     <div className="space-y-6">
@@ -84,6 +171,11 @@ export default function BookingExperience({ seats }: { seats: Seat[] }) {
         quantities={quantities}
         totalTickets={totalTickets}
         totalPrice={totalPrice}
+        selectedSeatIds={selectedSeatIds}
+        canCheckout={canCheckout}
+        checkoutLoading={checkoutLoading}
+        checkoutError={checkoutError}
+        onCheckout={beginCheckout}
       />
     </div>
   );

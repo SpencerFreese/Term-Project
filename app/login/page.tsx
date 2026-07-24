@@ -19,6 +19,16 @@ function LoginForm() {
 
   const verification = searchParams.get("verification");
 
+
+  const returnTo =
+  searchParams.get("returnTo") ?? "";
+
+  const registerHref = returnTo
+    ? `/register?returnTo=${encodeURIComponent(
+        returnTo,
+      )}`
+    : "/register";
+
   const initialNotice =
     verification === "success"
       ? "Your email has been confirmed. You may now log in."
@@ -55,6 +65,7 @@ function LoginForm() {
         body: JSON.stringify({
           email,
           password,
+          returnTo,
         }),
       });
 
@@ -178,7 +189,7 @@ function LoginForm() {
           <p className="text-center text-sm text-zinc-600 dark:text-zinc-400">
             Do not have an account?{" "}
             <Link
-              href="/register"
+              href={registerHref}
               className="font-semibold text-sky-600 hover:underline"
             >
               Register

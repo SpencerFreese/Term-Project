@@ -18,6 +18,7 @@ export default function SeatMap({
           <p className="text-sm font-semibold uppercase tracking-[0.25em] text-sky-600 dark:text-sky-400">
             Step 2
           </p>
+
           <h2 className="text-xl font-bold text-zinc-950 dark:text-zinc-50">
             Select Your Seats
           </h2>
@@ -56,8 +57,11 @@ export default function SeatMap({
                     const isReserved =
                       seat.availability === "reserved";
 
+                    const isReservedByYou =
+                      seat.availability === "reserved_by_you";
+
                     const isUnavailable =
-                      seat.availability !== "available";
+                      isReserved || isBooked;
 
                     let seatClass =
                       "flex h-8 w-8 shrink-0 items-center justify-center rounded-md border text-[10px] font-semibold transition";
@@ -71,27 +75,36 @@ export default function SeatMap({
                     } else if (isSelected) {
                       seatClass +=
                         " border-sky-500 bg-sky-600 text-white";
+                    } else if (isReservedByYou) {
+                      seatClass +=
+                        " border-emerald-500 bg-emerald-500/20 text-emerald-700 hover:bg-emerald-500/30 dark:text-emerald-300";
                     } else if (isWheelchair) {
                       seatClass +=
-                        " border-emerald-400 bg-emerald-50 text-emerald-700 hover:border-emerald-500 dark:border-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300";
+                        " border-violet-400 bg-violet-50 text-violet-700 hover:border-violet-500 dark:border-violet-700 dark:bg-violet-950/40 dark:text-violet-300";
                     } else {
                       seatClass +=
                         " border-zinc-300 bg-zinc-50 text-zinc-600 hover:border-sky-500 hover:text-sky-600 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-300";
                     }
 
-                    const availabilityLabel = isBooked
-                      ? "booked"
-                      : isReserved
-                        ? "reserved"
-                        : "available";
-
+                    const availabilityLabel =
+                      isBooked
+                        ? "booked"
+                        : isReserved
+                          ? "reserved"
+                          : isReservedByYou
+                            ? "reserved by you"
+                            : "available";
 
                     return (
                       <button
                         key={seat.seatId}
                         type="button"
                         disabled={isUnavailable}
-                        onClick={() => onToggleSeat(seat)}
+                        onClick={() => {
+                          if (!isUnavailable) {
+                            onToggleSeat(seat);
+                          }
+                        }}
                         aria-pressed={isSelected}
                         aria-label={`Seat ${rowLabel}${seat.seatNumber}, ${availabilityLabel}${
                           isWheelchair
@@ -110,7 +123,6 @@ export default function SeatMap({
             ))}
           </div>
 
-          {/* Seat status key */}
           <div className="flex flex-wrap gap-4 pt-2 text-xs text-zinc-600 dark:text-zinc-400">
             <span className="flex items-center gap-2">
               <span className="h-3 w-3 rounded-sm border border-zinc-300 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900" />
@@ -120,6 +132,11 @@ export default function SeatMap({
             <span className="flex items-center gap-2">
               <span className="h-3 w-3 rounded-sm border border-sky-500 bg-sky-600" />
               Selected
+            </span>
+
+            <span className="flex items-center gap-2">
+              <span className="h-3 w-3 rounded-sm border border-emerald-500 bg-emerald-500/20" />
+              Reserved by You
             </span>
 
             <span className="flex items-center gap-2">
@@ -133,7 +150,7 @@ export default function SeatMap({
             </span>
 
             <span className="flex items-center gap-2">
-              <span className="h-3 w-3 rounded-sm border border-emerald-400 bg-emerald-50 dark:border-emerald-700 dark:bg-emerald-950/40" />
+              <span className="h-3 w-3 rounded-sm border border-violet-400 bg-violet-50 dark:border-violet-700 dark:bg-violet-950/40" />
               Wheelchair Accessible
             </span>
           </div>

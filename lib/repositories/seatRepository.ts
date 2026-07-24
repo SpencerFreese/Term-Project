@@ -3,7 +3,7 @@ import "server-only";
 import { type RowDataPacket } from "mysql2/promise";
 import { query } from "@/lib/db";
 
-export type SeatAvailability = "available" | "reserved" | "booked";
+export type SeatAvailability = "available" | "reserved" | "reserved_by_you" | "booked";
 
 
 export type Seat = {
@@ -25,7 +25,7 @@ export async function findSeatsByRoomId(theaterRoomId: number): Promise<Seat[]> 
         theater_room_id AS theaterRoomId,
         row_label AS rowLabel,
         seat_number AS seatNumber,
-        seat_type AS seatType
+        seat_type AS seatType,
         'available' AS availability
       FROM seats
       WHERE theater_room_id = ?
@@ -35,7 +35,7 @@ export async function findSeatsByRoomId(theaterRoomId: number): Promise<Seat[]> 
   );
 }
 
-export async function findSeatsByShowtimeId(showtimeId: number): Promise<Seat[]> {
+export async function findSeatsByShowtimeId(showtimeId: number, userId: number | null = null,): Promise<Seat[]> {
   return query<SeatRow>(
     `
       SELECT
@@ -46,17 +46,32 @@ export async function findSeatsByShowtimeId(showtimeId: number): Promise<Seat[]>
         s.seat_type AS seatType,
 
         CASE
-          WHEN ss.status = 'booked'
-            THEN 'booked'
+            WHEN ss.status = 'booked'
+                THEN 'booked'
 
-          WHEN ss.status = 'reserved'
-            AND (
-              ss.reserved_until IS NULL
-              OR ss.reserved_until > NOW()
-            )
-            THEN 'reserved'
+            WHEN ss.status = 'reserved'
+                AND ss.reserved_until > NOW()
+                AND ? IS NOT NULL
+                AND EXISTS (
+                    SELECT 1
+                    FROM booking_drafts bd
 
-          ELSE 'available'
+                    INNER JOIN booking_draft_seats bds
+                        ON bds.booking_draft_id =
+                          bd.booking_draft_id
+
+                    WHERE bd.user_id = ?
+                      AND bd.showtime_id = ?
+                      AND bd.expires_at > NOW()
+                      AND bds.seat_id = s.seat_id
+                )
+                THEN 'reserved_by_you'
+
+            WHEN ss.status = 'reserved'
+                AND ss.reserved_until > NOW()
+                THEN 'reserved'
+
+            ELSE 'available'
         END AS availability
 
       FROM showtimes st
@@ -77,6 +92,6 @@ export async function findSeatsByShowtimeId(showtimeId: number): Promise<Seat[]>
         s.row_label ASC,
         s.seat_number ASC
     `,
-    [showtimeId],
+    [userId, userId,showtimeId, showtimeId],
   );
 }
