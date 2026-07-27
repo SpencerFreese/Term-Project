@@ -177,34 +177,41 @@ async function normalizeMovieInput(
     number | null = null;
 
   if (
-    body.runtimeMinutes !== null &&
-    body.runtimeMinutes !==
-      undefined &&
-    body.runtimeMinutes !== ""
+    body.runtimeMinutes === null ||
+    body.runtimeMinutes ===
+      undefined ||
+    body.runtimeMinutes === ""
   ) {
-    runtimeMinutes = Number(
-      body.runtimeMinutes,
+    throw new AdminMovieValidationError(
+      "Runtime is required.",
     );
+  }
 
-    if (
-      !Number.isInteger(
-        runtimeMinutes,
-      ) ||
-      runtimeMinutes <= 0
-    ) {
-      throw new AdminMovieValidationError(
-        "Runtime must be a positive whole number.",
-      );
-    }
+  runtimeMinutes = Number(
+    body.runtimeMinutes,
+  );
+
+  if (
+    !Number.isInteger(
+      runtimeMinutes,
+    ) ||
+    runtimeMinutes <= 0
+  ) {
+    throw new AdminMovieValidationError(
+      "Runtime must be a positive whole number.",
+    );
   }
 
   const releaseDate =
     optionalText(body.releaseDate);
 
-  if (
-    releaseDate &&
-    !isValidDate(releaseDate)
-  ) {
+  if (!releaseDate) {
+    throw new AdminMovieValidationError(
+      "Release date is required.",
+    );
+  }
+
+  if (!isValidDate(releaseDate)) {
     throw new AdminMovieValidationError(
       "Select a valid release date.",
     );
@@ -270,30 +277,34 @@ async function normalizeMovieInput(
     );
   }
 
-  if (genreIds.length > 0) {
-    const genres =
-      await findAllGenres();
+  if (genreIds.length === 0) {
+    throw new AdminMovieValidationError(
+      "Select at least one genre.",
+    );
+  }
 
-    const validGenreIds =
-      new Set(
-        genres.map(
-          (genre) =>
-            genre.genreId,
+  const genres =
+    await findAllGenres();
+
+  const validGenreIds =
+    new Set(
+      genres.map(
+        (genre) =>
+          genre.genreId,
+      ),
+    );
+
+  if (
+    genreIds.some(
+      (genreId) =>
+        !validGenreIds.has(
+          genreId,
         ),
-      );
-
-    if (
-      genreIds.some(
-        (genreId) =>
-          !validGenreIds.has(
-            genreId,
-          ),
-      )
-    ) {
-      throw new AdminMovieValidationError(
-        "Invalid genre selection.",
-      );
-    }
+    )
+  ) {
+    throw new AdminMovieValidationError(
+      "Invalid genre selection.",
+    );
   }
 
   if (

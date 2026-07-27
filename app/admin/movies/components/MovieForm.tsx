@@ -45,7 +45,10 @@ function validateMovieForm(
       "Title is required.";
   }
 
-  if (form.runtimeMinutes) {
+  if (!form.runtimeMinutes.trim()) {
+    errors.runtimeMinutes =
+      "Runtime is required.";
+  } else {
     const runtime =
       Number(form.runtimeMinutes);
 
@@ -58,8 +61,10 @@ function validateMovieForm(
     }
   }
 
-  if (
-    form.releaseDate &&
+  if (!form.releaseDate) {
+    errors.releaseDate =
+      "Release date is required.";
+  } else if (
     !/^\d{4}-\d{2}-\d{2}$/.test(
       form.releaseDate,
     )
@@ -76,6 +81,11 @@ function validateMovieForm(
   if (!isValidHttpUrl(form.trailerUrl)) {
     errors.trailerUrl =
       "Trailer URL must begin with http:// or https://.";
+  }
+
+  if (form.genreIds.length === 0) {
+    errors.genreIds =
+      "Select at least one genre.";
   }
 
   return errors;
@@ -387,7 +397,10 @@ export default function MovieForm({
             htmlFor="runtimeMinutes"
             className="text-sm font-semibold"
           >
-            Runtime (minutes)
+            Runtime (minutes){" "}
+            <span className="text-red-500">
+              *
+            </span>
           </label>
 
           <input
@@ -395,6 +408,7 @@ export default function MovieForm({
             name="runtimeMinutes"
             type="number"
             min="1"
+            required
             value={
               form.runtimeMinutes
             }
@@ -417,13 +431,17 @@ export default function MovieForm({
             htmlFor="releaseDate"
             className="text-sm font-semibold"
           >
-            Release Date
+            Release Date{" "}
+            <span className="text-red-500">
+              *
+            </span>
           </label>
 
           <input
             id="releaseDate"
             name="releaseDate"
             type="date"
+            required
             value={form.releaseDate}
             onChange={handleChange}
             className="rounded-lg border border-zinc-300 px-4 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
@@ -507,7 +525,10 @@ export default function MovieForm({
 
       <fieldset className="flex flex-col gap-2">
         <legend className="text-sm font-semibold">
-          Genres
+          Genres{" "}
+          <span className="text-red-500">
+            *
+          </span>
         </legend>
 
         <div className="flex flex-wrap gap-2">
@@ -538,6 +559,12 @@ export default function MovieForm({
             );
           })}
         </div>
+
+        {errors.genreIds ? (
+          <p className="text-xs text-red-500">
+            {errors.genreIds}
+          </p>
+        ) : null}
       </fieldset>
 
       <div className="flex flex-wrap gap-3">
