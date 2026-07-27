@@ -415,7 +415,7 @@ export async function confirmCheckout(input: ConfirmCheckoutInput) {
         [
           {
             ticketCategory:
-              "adult",
+              "adult" as const,
             quantity:
               quantities.adult,
             unitPrice:
@@ -423,7 +423,7 @@ export async function confirmCheckout(input: ConfirmCheckoutInput) {
           },
           {
             ticketCategory:
-              "senior",
+              "senior" as const,
             quantity:
               quantities.senior,
             unitPrice:
@@ -431,7 +431,7 @@ export async function confirmCheckout(input: ConfirmCheckoutInput) {
           },
           {
             ticketCategory:
-              "child",
+              "child" as const,
             quantity:
               quantities.child,
             unitPrice:

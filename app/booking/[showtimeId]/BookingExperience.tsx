@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState } from "react";
 import type { Seat } from "@/lib/repositories/seatRepository";
 import TicketSelector from "./components/TicketSelector";
 import SeatMap from "./components/SeatMap";
@@ -55,10 +55,27 @@ export default function BookingExperience({ seats, showtimeId}: {
   // Adjusts how many tickets of a given category are selected, clamped at 0
   // so decrementing past zero is a no-op.
   function updateQuantity(key: TicketCategoryKey, delta: number) {
-    setQuantities((current) => ({
-      ...current,
-      [key]: Math.max(0, current[key] + delta),
-    }));
+    setQuantities((current) => {
+      const next = {
+        ...current,
+        [key]: Math.max(0, current[key] + delta),
+      };
+
+      const nextTotalTickets =
+        next.adult + next.senior + next.child;
+
+      setSelectedSeatIds((currentSeatIds) => {
+        if (currentSeatIds.size <= nextTotalTickets) {
+          return currentSeatIds;
+        }
+
+        return new Set(
+          Array.from(currentSeatIds).slice(0, nextTotalTickets),
+        );
+      });
+
+      return next;
+    });
   }
 
   // Selects or deselects a seat. Re-clicking a selected seat always
@@ -89,18 +106,6 @@ export default function BookingExperience({ seats, showtimeId}: {
     return next;
   });
 }
-
-  useEffect(() => {
-  setSelectedSeatIds((current) => {
-    if (current.size <= totalTickets) {
-      return current;
-    }
-
-    return new Set(
-      Array.from(current).slice(0, totalTickets),
-    );
-  });
-}, [totalTickets]);
 
   async function beginCheckout() {
   if (!canCheckout || checkoutLoading) {

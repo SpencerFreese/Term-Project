@@ -110,7 +110,7 @@ export async function POST(
       },
     );
   } catch (error) {
-    if (error instanceofCheckoutValidationError) {
+    if (error instanceof CheckoutValidationError) {
       return NextResponse.json(
         {
           error: error.message,

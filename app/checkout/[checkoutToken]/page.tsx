@@ -4,17 +4,12 @@ import {
 } from "next/navigation";
 
 import { getSession } from "@/lib/auth";
-import { lastFourDigits } from "@/lib/cardEncryption";
 
 import {findBookingDraftDetailsByToken} from "@/lib/repositories/bookingDraftRepository";
-
-import {findCardsByUserId} from "@/lib/repositories/paymentCardRepository";
 
 import {findUserProfileById} from "@/lib/repositories/userRepository";
 
 import {claimBookingDraftForUser} from "@/lib/services/checkoutService";
-
-import {getSeatsForShowtime} from "@/lib/services/seatService";
 
 import CheckoutExperience from "./CheckoutExperience";
 
@@ -55,56 +50,11 @@ export default async function CheckoutPage({params}: {params: Promise<{checkoutT
     notFound();
   }
 
-  const [user, cards, seats] =
-    await Promise.all([
-      findUserProfileById(session.userId),
-
-      findCardsByUserId(session.userId),
-
-      getSeatsForShowtime(draft.showtimeId, session.userId),
-    ]);
+  const user = await findUserProfileById(session.userId);
 
   if (!user) {
     redirect("/login");
   }
-
-  /*
-   * Only send masked card information to
-   * the client component.
-   */
-  const maskedCards = cards.map(
-    (card) => ({
-      cardId: card.cardId,
-
-      cardholderName: card.cardholderName,
-
-      cardType: card.cardType,
-
-      expiryMonth: card.expiryMonth,
-
-      expiryYear: card.expiryYear,
-
-      lastFour: lastFourDigits(card.cardNumberEncrypted),
-    }),
-  );
-
-  /*
-   * Convert MySQL rows into plain objects
-   * before sending them to a client component.
-   */
-  const checkoutSeats = seats.map(
-    (seat) => ({
-      seatId:seat.seatId,
-
-      rowLabel:seat.rowLabel,
-
-      seatNumber:seat.seatNumber,
-
-      seatType: seat.seatType,
-
-      availability:seat.availability,
-    }),
-  );
 
   const selectedSeats =
     draft.selectedSeats.map(
@@ -129,9 +79,7 @@ export default async function CheckoutPage({params}: {params: Promise<{checkoutT
         roomName={draft.roomName}
         formatType={draft.formatType}
         quantities={draft.quantities}
-        seats={checkoutSeats }
         selectedSeats={ selectedSeats}
-        cards={maskedCards}
         expiresAt={draft.expiresAt}
       />
     </main>
