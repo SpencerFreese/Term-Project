@@ -23,6 +23,10 @@ function LoginForm() {
   const returnTo =
   searchParams.get("returnTo") ?? "";
 
+  const isCheckoutResume =
+    returnTo.startsWith("/checkout/") ||
+    returnTo.startsWith("/payment/");
+
   const registerHref = returnTo
     ? `/register?returnTo=${encodeURIComponent(
         returnTo,
@@ -91,7 +95,9 @@ function LoginForm() {
         <h1 className="mb-2 text-3xl font-bold">Login</h1>
 
         <p className="mb-6 text-sm text-zinc-600 dark:text-zinc-400">
-          Sign in to manage your profile, favorites, and bookings.
+          {isCheckoutResume
+            ? "Sign in to continue checkout. Your selected seats will stay reserved while you finish this step."
+            : "Sign in to manage your profile, favorites, and bookings."}
         </p>
         <Link
           href="/"

@@ -42,7 +42,13 @@ export default async function PaymentPage({
 }) {
   const { checkoutToken } = await params;
   const resolvedSearchParams = await searchParams;
-  const returnTo = `/payment/${checkoutToken}`;
+  const initialEmail = Array.isArray(resolvedSearchParams.email)
+    ? resolvedSearchParams.email[0]
+    : resolvedSearchParams.email;
+
+  const returnTo = initialEmail
+    ? `/payment/${checkoutToken}?email=${encodeURIComponent(initialEmail)}`
+    : `/payment/${checkoutToken}`;
 
   const session = await getSession();
 

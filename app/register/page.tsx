@@ -18,6 +18,10 @@ function RegisterForm() {
   const returnTo =
     searchParams.get("returnTo") ?? "";
 
+  const isCheckoutResume =
+    returnTo.startsWith("/checkout/") ||
+    returnTo.startsWith("/payment/");
+
   const loginHref = returnTo
     ? `/login?returnTo=${encodeURIComponent(
         returnTo,
@@ -121,8 +125,9 @@ setSuccess(
         <h1 className="text-3xl font-bold">Create an account</h1>
 
         <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-          Register to purchase tickets, save favorite movies, and
-          manage your profile.
+          {isCheckoutResume
+            ? "Create an account to continue checkout. After you confirm your email, you will return to your reserved seats."
+            : "Register to purchase tickets, save favorite movies, and manage your profile."}
         </p>
 
         <Link
