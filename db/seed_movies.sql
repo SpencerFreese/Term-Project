@@ -192,26 +192,7 @@ VALUES
 ('Theater Room 2', 6, 10, 'IMAX'),
 ('Theater Room 3', 5,10, 'Dolby');
 
-INSERT IGNORE INTO showtimes (
-    movie_id,
-    theater_room_id,
-    start_time,
-    end_time,
-    format_type,
-    status
-)
-SELECT
-    m.movie_id,
-    r.theater_room_id,
-    '2026-07-02 15:00:00',
-    '2026-07-02 17:00:00',
-    'Standard',
-    'scheduled'
-FROM movies m
-JOIN theater_rooms r
-WHERE m.title = 'Toy Story 5'
-  AND r.room_name = 'Theater Room 1';
-  -- ------------------------------------------------------------
+-- ------------------------------------------------------------
 -- Showtimes
 -- Every currently_playing movie gets showtimes
 -- ------------------------------------------------------------
@@ -226,8 +207,8 @@ WHERE m.status = 'currently_playing';
 -- Project Hail Mary
 INSERT INTO showtimes (movie_id, theater_room_id, start_time, end_time, format_type, status)
 SELECT m.movie_id, r.theater_room_id,
-       '2026-07-01 14:00:00',
-       '2026-07-01 16:30:00',
+       TIMESTAMP(DATE_ADD(CURDATE(), INTERVAL 1 DAY), '14:00:00'),
+       TIMESTAMP(DATE_ADD(CURDATE(), INTERVAL 1 DAY), '16:30:00'),
        'Standard',
        'scheduled'
 FROM movies m
@@ -236,8 +217,8 @@ WHERE m.title = 'Project Hail Mary';
 
 INSERT INTO showtimes (movie_id, theater_room_id, start_time, end_time, format_type, status)
 SELECT m.movie_id, r.theater_room_id,
-       '2026-07-01 18:00:00',
-       '2026-07-01 20:30:00',
+       TIMESTAMP(DATE_ADD(CURDATE(), INTERVAL 1 DAY), '18:00:00'),
+       TIMESTAMP(DATE_ADD(CURDATE(), INTERVAL 1 DAY), '20:30:00'),
        'IMAX',
        'scheduled'
 FROM movies m
@@ -247,8 +228,8 @@ WHERE m.title = 'Project Hail Mary';
 -- Toy Story 5
 INSERT INTO showtimes (movie_id, theater_room_id, start_time, end_time, format_type, status)
 SELECT m.movie_id, r.theater_room_id,
-       '2026-07-02 13:00:00',
-       '2026-07-02 14:45:00',
+       TIMESTAMP(DATE_ADD(CURDATE(), INTERVAL 2 DAY), '13:00:00'),
+       TIMESTAMP(DATE_ADD(CURDATE(), INTERVAL 2 DAY), '14:45:00'),
        'Standard',
        'scheduled'
 FROM movies m
@@ -257,8 +238,8 @@ WHERE m.title = 'Toy Story 5';
 
 INSERT INTO showtimes (movie_id, theater_room_id, start_time, end_time, format_type, status)
 SELECT m.movie_id, r.theater_room_id,
-       '2026-07-02 17:30:00',
-       '2026-07-02 19:15:00',
+       TIMESTAMP(DATE_ADD(CURDATE(), INTERVAL 2 DAY), '17:30:00'),
+       TIMESTAMP(DATE_ADD(CURDATE(), INTERVAL 2 DAY), '19:15:00'),
        'IMAX',
        'scheduled'
 FROM movies m
@@ -268,8 +249,8 @@ WHERE m.title = 'Toy Story 5';
 -- Star Wars: The Mandalorian and Grogu
 INSERT INTO showtimes (movie_id, theater_room_id, start_time, end_time, format_type, status)
 SELECT m.movie_id, r.theater_room_id,
-       '2026-07-03 15:00:00',
-       '2026-07-03 17:15:00',
+       TIMESTAMP(DATE_ADD(CURDATE(), INTERVAL 3 DAY), '15:00:00'),
+       TIMESTAMP(DATE_ADD(CURDATE(), INTERVAL 3 DAY), '17:15:00'),
        'Standard',
        'scheduled'
 FROM movies m
@@ -278,8 +259,8 @@ WHERE m.title = 'Star Wars: The Mandalorian and Grogu';
 
 INSERT INTO showtimes (movie_id, theater_room_id, start_time, end_time, format_type, status)
 SELECT m.movie_id, r.theater_room_id,
-       '2026-07-03 19:30:00',
-       '2026-07-03 21:45:00',
+       TIMESTAMP(DATE_ADD(CURDATE(), INTERVAL 3 DAY), '19:30:00'),
+       TIMESTAMP(DATE_ADD(CURDATE(), INTERVAL 3 DAY), '21:45:00'),
        'IMAX',
        'scheduled'
 FROM movies m
@@ -289,8 +270,8 @@ WHERE m.title = 'Star Wars: The Mandalorian and Grogu';
 -- Scream 7
 INSERT INTO showtimes (movie_id, theater_room_id, start_time, end_time, format_type, status)
 SELECT m.movie_id, r.theater_room_id,
-       '2026-07-04 16:00:00',
-       '2026-07-04 18:00:00',
+       TIMESTAMP(DATE_ADD(CURDATE(), INTERVAL 4 DAY), '16:00:00'),
+       TIMESTAMP(DATE_ADD(CURDATE(), INTERVAL 4 DAY), '18:00:00'),
        'Standard',
        'scheduled'
 FROM movies m
@@ -299,8 +280,8 @@ WHERE m.title = 'Scream 7';
 
 INSERT INTO showtimes (movie_id, theater_room_id, start_time, end_time, format_type, status)
 SELECT m.movie_id, r.theater_room_id,
-       '2026-07-04 21:00:00',
-       '2026-07-04 23:00:00',
+       TIMESTAMP(DATE_ADD(CURDATE(), INTERVAL 4 DAY), '21:00:00'),
+       TIMESTAMP(DATE_ADD(CURDATE(), INTERVAL 4 DAY), '23:00:00'),
        'Standard',
        'scheduled'
 FROM movies m
@@ -310,8 +291,8 @@ WHERE m.title = 'Scream 7';
 -- Mortal Kombat II
 INSERT INTO showtimes (movie_id, theater_room_id, start_time, end_time, format_type, status)
 SELECT m.movie_id, r.theater_room_id,
-       '2026-07-05 14:30:00',
-       '2026-07-05 16:30:00',
+       TIMESTAMP(DATE_ADD(CURDATE(), INTERVAL 5 DAY), '14:30:00'),
+       TIMESTAMP(DATE_ADD(CURDATE(), INTERVAL 5 DAY), '16:30:00'),
        'Standard',
        'scheduled'
 FROM movies m
@@ -320,8 +301,8 @@ WHERE m.title = 'Mortal Kombat II';
 
 INSERT INTO showtimes (movie_id, theater_room_id, start_time, end_time, format_type, status)
 SELECT m.movie_id, r.theater_room_id,
-       '2026-07-05 20:00:00',
-       '2026-07-05 22:00:00',
+       TIMESTAMP(DATE_ADD(CURDATE(), INTERVAL 5 DAY), '20:00:00'),
+       TIMESTAMP(DATE_ADD(CURDATE(), INTERVAL 5 DAY), '22:00:00'),
        'IMAX',
        'scheduled'
 FROM movies m
@@ -331,8 +312,8 @@ WHERE m.title = 'Mortal Kombat II';
 -- The Super Mario Galaxy Movie
 INSERT INTO showtimes (movie_id, theater_room_id, start_time, end_time, format_type, status)
 SELECT m.movie_id, r.theater_room_id,
-       '2026-07-06 12:30:00',
-       '2026-07-06 14:15:00',
+       TIMESTAMP(DATE_ADD(CURDATE(), INTERVAL 6 DAY), '12:30:00'),
+       TIMESTAMP(DATE_ADD(CURDATE(), INTERVAL 6 DAY), '14:15:00'),
        'Standard',
        'scheduled'
 FROM movies m
@@ -341,8 +322,8 @@ WHERE m.title = 'The Super Mario Galaxy Movie';
 
 INSERT INTO showtimes (movie_id, theater_room_id, start_time, end_time, format_type, status)
 SELECT m.movie_id, r.theater_room_id,
-       '2026-07-06 17:00:00',
-       '2026-07-06 18:45:00',
+       TIMESTAMP(DATE_ADD(CURDATE(), INTERVAL 6 DAY), '17:00:00'),
+       TIMESTAMP(DATE_ADD(CURDATE(), INTERVAL 6 DAY), '18:45:00'),
        'IMAX',
        'scheduled'
 FROM movies m
