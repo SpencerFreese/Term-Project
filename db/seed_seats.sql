@@ -8,7 +8,6 @@
 USE term_project; 
 -- Must be deleted first because it references seats
 DELETE FROM showtime_seats;
-DELETE FROM showtime_seats;
 -- Remove the old physical seat layout
 DELETE FROM seats;
 -- ------------------------------------------------------------

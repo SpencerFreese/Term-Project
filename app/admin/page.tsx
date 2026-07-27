@@ -3,6 +3,45 @@ import { getSession } from "@/lib/auth";
 import LogoutButton from "../components/LogoutButton";
 import Link from "next/link";
 
+function AdminMenuCard({
+  title,
+  description,
+  href,
+}: {
+  title: string;
+  description: string;
+  href?: string;
+}) {
+  const className =
+    "rounded-2xl border border-zinc-300 p-6 dark:border-zinc-800";
+
+  if (href) {
+    return (
+      <Link
+        href={href}
+        className={`${className} hover:bg-zinc-100 dark:hover:bg-zinc-900`}
+      >
+        <h2 className="text-xl font-semibold">{title}</h2>
+        <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+          {description}
+        </p>
+      </Link>
+    );
+  }
+
+  return (
+    <div
+      aria-disabled="true"
+      className={`${className} cursor-not-allowed opacity-70`}
+    >
+      <h2 className="text-xl font-semibold">{title}</h2>
+      <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+        {description}
+      </p>
+    </div>
+  );
+}
+
 export default async function AdminPage() {
   const session = await getSession();
 
@@ -37,33 +76,27 @@ export default async function AdminPage() {
       </div>
 
       <section className="grid gap-4 sm:grid-cols-2">
-        <Link href="/admin/movies" className="rounded-2xl border border-zinc-300 p-6 hover:bg-zinc-100 dark:border-zinc-800 dark:hover:bg-zinc-900">
-          <h2 className="text-xl font-semibold">Manage Movies</h2>
-          <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-            Add, update, or remove movies.
-          </p>
-        </Link>
+        <AdminMenuCard
+          title="Manage Movies"
+          description="Add, update, or remove movies."
+          href="/admin/movies"
+        />
 
-        <Link href="/admin/promotions" className="rounded-2xl border border-zinc-300 p-6 hover:bg-zinc-100 dark:border-zinc-800 dark:hover:bg-zinc-900">
-          <h2 className="text-xl font-semibold">Promotions</h2>
-          <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-            Manage promotion codes and discounts.
-          </p>
-        </Link>
+        <AdminMenuCard
+          title="Promotions"
+          description="Optional bonus feature. Not included in this deliverable."
+        />
 
-        <Link href="/admin/users" className="rounded-2xl border border-zinc-300 p-6 hover:bg-zinc-100 dark:border-zinc-800 dark:hover:bg-zinc-900">
-          <h2 className="text-xl font-semibold">Users</h2>
-          <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-            View and manage user accounts.
-          </p>
-        </Link>
+        <AdminMenuCard
+          title="Users"
+          description="User management is not required for this deliverable."
+        />
 
-        <Link href="/admin/showtimes" className="rounded-2xl border border-zinc-300 p-6 hover:bg-zinc-100 dark:border-zinc-800 dark:hover:bg-zinc-900">
-          <h2 className="text-xl font-semibold">Showtimes</h2>
-          <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-            Manage movie showtimes.
-          </p>
-        </Link>
+        <AdminMenuCard
+          title="Showtimes"
+          description="Manage movie showtimes."
+          href="/admin/showtimes"
+        />
       </section>
     </main>
   );
