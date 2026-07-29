@@ -56,6 +56,11 @@ Seed test customer/admin accounts (this will also remove all users from the db a
 Get-Content -Raw db/seed_users.sql | docker exec -i term-project-mysql mysql -uroot -pterm_project_root term_project
 ```
 
+run checkout tables script
+```powershell
+Get-Content db/checkout_tables.sql | docker compose exec -T mysql mysql -uroot -pterm_project_root term_project
+```
+
 '''bash
 Admin:
 Email: admin@test.com
