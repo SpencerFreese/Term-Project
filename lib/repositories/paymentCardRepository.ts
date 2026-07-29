@@ -1,6 +1,6 @@
 import "server-only";
 
-import { type RowDataPacket } from "mysql2/promise";
+import { type PoolConnection, type RowDataPacket } from "mysql2/promise";
 import { execute, query } from "@/lib/db";
 
 export const MAX_CARDS_PER_USER = 3;
@@ -126,4 +126,40 @@ export async function deleteCard(cardId: number, userId: number) {
     `,
     [cardId, userId],
   );
+}
+
+export async function findCardByIdForUpdate(
+  connection: PoolConnection,
+  cardId: number,
+  userId: number,
+) {
+  const [rows] =
+    await connection.execute<
+      PaymentCardRow[]
+    >(
+      `
+        SELECT
+          card_id AS cardId,
+          user_id AS userId,
+          card_number_encrypted
+            AS cardNumberEncrypted,
+          cardholder_name
+            AS cardholderName,
+          expiry_month AS expiryMonth,
+          expiry_year AS expiryYear,
+          card_type AS cardType,
+          card_order AS cardOrder
+        FROM user_payment_cards
+        WHERE card_id = ?
+          AND user_id = ?
+        LIMIT 1
+        FOR UPDATE
+      `,
+      [
+        cardId,
+        userId,
+      ],
+    );
+
+  return rows[0] ?? null;
 }

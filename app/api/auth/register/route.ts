@@ -20,7 +20,22 @@ type RegistrationRequest = {
   password?: unknown;
   confirmPassword?: unknown;
   promoSubscribed?: unknown;
+  returnTo?: unknown;
 };
+
+function getSafeReturnTo(
+  value: unknown,
+): string | null {
+  if (
+    typeof value !== "string" ||
+    !value.startsWith("/") ||
+    value.startsWith("//")
+  ) {
+    return null;
+  }
+
+  return value;
+}
 
 export async function POST(request: Request) {
   try {
@@ -51,6 +66,8 @@ export async function POST(request: Request) {
         : "";
 
     const promoSubscribed = body.promoSubscribed === true;
+
+    const returnTo = getSafeReturnTo(body.returnTo);
 
     if (!firstName || !lastName || !email || !password || !confirmPassword) {
       return NextResponse.json(
@@ -126,6 +143,7 @@ export async function POST(request: Request) {
       email,
       firstName,
       verificationToken,
+      returnTo,
     );
 
     return NextResponse.json(

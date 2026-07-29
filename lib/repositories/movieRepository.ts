@@ -1,9 +1,15 @@
 import "server-only";
 
-import { type RowDataPacket } from "mysql2/promise";
-import { query } from "@/lib/db";
+import { query, withTransaction} from "@/lib/db";
 
-export type MovieStatus = "currently_playing" | "coming_soon";
+import {
+  type PoolConnection,
+  type ResultSetHeader,
+  type RowDataPacket,
+} from "mysql2/promise";
+
+import type { MovieStatus} from "@/lib/movieForm";
+export type { MovieStatus} from "@/lib/movieForm";
 
 export type Movie = {
   movieId: number;
@@ -24,6 +30,19 @@ export type MovieFilters = {
   searchTerm?: string;
   genres?: string[];
   showDate?: string;
+};
+
+export type MovieWriteInput = {
+  title: string;
+  description: string | null;
+  posterUrl: string | null;
+  trailerUrl: string | null;
+  mpaaRating: string | null;
+  castList: string | null;
+  runtimeMinutes: number | null;
+  releaseDate: string | null;
+  status: MovieStatus;
+  genreIds: number[];
 };
 
 type MovieRow = RowDataPacket & Movie;
@@ -137,4 +156,153 @@ export async function searchMovies(searchTerm: string) {
 
 export async function findMoviesByGenre(genreName: string) {
   return findMovies({ genres: [genreName] });
+}
+
+async function replaceMovieGenres(
+  connection: PoolConnection,
+  movieId: number,
+  genreIds: number[],
+) {
+  await connection.execute(
+    `
+      DELETE FROM movie_genres
+      WHERE movie_id = ?
+    `,
+    [movieId],
+  );
+
+  for (const genreId of genreIds) {
+    await connection.execute(
+      `
+        INSERT INTO movie_genres (
+          movie_id,
+          genre_id
+        )
+        VALUES (?, ?)
+      `,
+      [
+        movieId,
+        genreId,
+      ],
+    );
+  }
+}
+
+export async function findMovieGenreIds(
+  movieId: number,
+) {
+  type GenreIdRow =
+    RowDataPacket & {
+      genreId: number;
+    };
+
+  const rows =
+    await query<GenreIdRow>(
+      `
+        SELECT
+          genre_id AS genreId
+        FROM movie_genres
+        WHERE movie_id = ?
+        ORDER BY genre_id ASC
+      `,
+      [movieId],
+    );
+
+  return rows.map(
+    (row) => row.genreId,
+  );
+}
+
+export async function insertMovie(
+  input: MovieWriteInput,
+) {
+  return withTransaction(
+    async (connection) => {
+      const [result] =
+        await connection.execute<ResultSetHeader>(
+          `
+            INSERT INTO movies (
+              title,
+              description,
+              poster_url,
+              trailer_url,
+              mpaa_rating,
+              cast_list,
+              runtime_minutes,
+              release_date,
+              status
+            )
+            VALUES (
+              ?, ?, ?, ?, ?, ?, ?, ?, ?
+            )
+          `,
+          [
+            input.title,
+            input.description,
+            input.posterUrl,
+            input.trailerUrl,
+            input.mpaaRating,
+            input.castList,
+            input.runtimeMinutes,
+            input.releaseDate,
+            input.status,
+          ],
+        );
+
+      const movieId =
+        result.insertId;
+
+      await replaceMovieGenres(
+        connection,
+        movieId,
+        input.genreIds,
+      );
+
+      return movieId;
+    },
+  );
+}
+
+export async function updateMovie(
+  movieId: number,
+  input: MovieWriteInput,
+) {
+  await withTransaction(
+    async (connection) => {
+      await connection.execute<ResultSetHeader>(
+        `
+          UPDATE movies
+          SET
+            title = ?,
+            description = ?,
+            poster_url = ?,
+            trailer_url = ?,
+            mpaa_rating = ?,
+            cast_list = ?,
+            runtime_minutes = ?,
+            release_date = ?,
+            status = ?
+          WHERE movie_id = ?
+        `,
+        [
+          input.title,
+          input.description,
+          input.posterUrl,
+          input.trailerUrl,
+          input.mpaaRating,
+          input.castList,
+          input.runtimeMinutes,
+          input.releaseDate,
+          input.status,
+          movieId,
+        ],
+      );
+
+      await replaceMovieGenres(
+        connection,
+        movieId,
+        input.genreIds,
+      );
+    },
+  );
 }

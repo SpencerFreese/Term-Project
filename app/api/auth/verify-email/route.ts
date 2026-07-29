@@ -5,13 +5,55 @@ import {
 } from "@/lib/repositories/emailVerificationRepository";
 import { activateUser } from "@/lib/repositories/userRepository";
 
+
+function getSafeReturnTo(
+  value: string | null,
+): string | null {
+  if (
+    !value ||
+    !value.startsWith("/") ||
+    value.startsWith("//")
+  ) {
+    return null;
+  }
+
+  return value;
+}
+
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
-  const token = requestUrl.searchParams.get("token");
+
+  const token =requestUrl.searchParams.get("token");
+
+  const returnTo = getSafeReturnTo(requestUrl.searchParams.get("returnTo"));
+
+  function createLoginUrl(
+  verification:
+    | "success"
+    | "invalid"
+    | "error",
+  ) {
+    const loginUrl =
+      new URL("/login", request.url);
+
+    loginUrl.searchParams.set(
+      "verification",
+      verification,
+    );
+
+    if (returnTo) {
+      loginUrl.searchParams.set(
+        "returnTo",
+        returnTo,
+      );
+    }
+
+    return loginUrl;
+  }
 
   if (!token) {
     return NextResponse.redirect(
-      new URL("/login?verification=invalid", request.url),
+      createLoginUrl("invalid"),
     );
   }
 
@@ -21,7 +63,7 @@ export async function GET(request: Request) {
 
     if (!verificationToken) {
       return NextResponse.redirect(
-        new URL("/login?verification=invalid", request.url),
+        createLoginUrl("invalid"),
       );
     }
 
@@ -32,13 +74,13 @@ export async function GET(request: Request) {
     );
 
     return NextResponse.redirect(
-      new URL("/login?verification=success", request.url),
+      createLoginUrl("success"),
     );
   } catch (error) {
     console.error("Email verification error:", error);
 
     return NextResponse.redirect(
-      new URL("/login?verification=error", request.url),
+      createLoginUrl("error"),
     );
   }
 }

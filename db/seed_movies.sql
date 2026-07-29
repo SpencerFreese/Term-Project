@@ -189,7 +189,8 @@ WHERE m.title = 'Avengers: Doomsday'        AND g.name IN ('Action', 'Adventure'
 INSERT IGNORE INTO theater_rooms (room_name, seat_rows, seat_cols, format_type)
 VALUES
 ('Theater Room 1', 5, 8, 'Standard'),
-('Theater Room 2', 6, 10, 'IMAX');
+('Theater Room 2', 6, 10, 'IMAX'),
+('Theater Room 3', 5,10, 'Dolby');
 
 INSERT IGNORE INTO showtimes (
     movie_id,

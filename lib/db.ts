@@ -2,6 +2,7 @@ import "server-only";
 
 import mysql, {
   type Pool,
+  type PoolConnection,
   type ResultSetHeader,
   type RowDataPacket,
 } from "mysql2/promise";
@@ -57,4 +58,29 @@ export async function execute(
   );
 
   return result;
+}
+
+export async function withTransaction<T>(
+  work: (
+    connection: PoolConnection,
+  ) => Promise<T>,
+) {
+  const connection =
+    await pool.getConnection();
+
+  try {
+    await connection.beginTransaction();
+
+    const result =
+      await work(connection);
+
+    await connection.commit();
+
+    return result;
+  } catch (error) {
+    await connection.rollback();
+    throw error;
+  } finally {
+    connection.release();
+  }
 }

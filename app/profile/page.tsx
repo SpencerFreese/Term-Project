@@ -50,20 +50,30 @@ export default async function ProfilePage() {
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-sky-500">
             Customer Profile
           </p>
+
           <h1 className="text-4xl font-bold">
             Welcome, {user.firstName}
           </h1>
         </div>
 
-        <div className="flex items-center gap-3">
-          <Link
-            href="/"
-            className="rounded-lg border border-zinc-300 px-4 py-2 text-sm font-semibold hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-900"
-          >
-            Home
-          </Link>
+        <div className="flex flex-col items-end gap-3">
+          <div className="flex items-center gap-3">
+            <Link
+              href="/"
+              className="rounded-lg border border-zinc-300 px-4 py-2 text-sm font-semibold hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-900"
+            >
+              Home
+            </Link>
 
-          <LogoutButton />
+            <LogoutButton />
+          </div>
+
+          <Link
+            href="/orders"
+            className="rounded-lg bg-sky-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-sky-500"
+          >
+            My Orders
+          </Link>
         </div>
       </div>
 
