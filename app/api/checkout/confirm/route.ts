@@ -2,11 +2,22 @@ import { NextResponse } from "next/server";
 
 import { getSession } from "@/lib/auth";
 
+import type {
+  CheckoutCoordinator,
+} from "@/lib/services/checkoutCoordinator";
+
 import {
   CheckoutConflictError,
   CheckoutValidationError,
-  confirmCheckout,
+  checkoutService,
 } from "@/lib/services/checkoutService";
+
+/*
+ * The route depends on the CheckoutCoordinator
+ * abstraction rather than on the concrete CheckoutService,
+ * so it only sees the one operation it needs.
+ */
+const checkoutCoordinator: CheckoutCoordinator = checkoutService;
 
 type ConfirmCheckoutRequest = {
   checkoutToken?: unknown;
@@ -70,7 +81,7 @@ export async function POST(
         ? body.paymentCardId
         : Number(body.paymentCardId);
 
-    const order = await confirmCheckout({
+    const order = await checkoutCoordinator.completeCheckout({
       checkoutToken,
       userId: session.userId,
       confirmationEmail,

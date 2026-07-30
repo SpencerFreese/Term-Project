@@ -27,6 +27,35 @@ function getTransporter() {
   });
 }
 
+/*
+ * Low-level email primitive used by higher-level senders
+ * (e.g. NotificationService). Falls back to logging when
+ * SMTP is not configured, matching the other functions in
+ * this file.
+ */
+export async function sendEmail(
+  to: string,
+  subject: string,
+  body: { text: string; html: string },
+): Promise<void> {
+  const transporter = getTransporter();
+
+  if (!transporter) {
+    console.log("SMTP is not configured. Email was not sent");
+    console.log(`Subject: ${subject}`);
+    console.log(`To: ${to}`);
+    return;
+  }
+
+  await transporter.sendMail({
+    from: process.env.EMAIL_FROM ?? process.env.SMTP_USER,
+    to,
+    subject,
+    text: body.text,
+    html: body.html,
+  });
+}
+
 export async function sendVerificationEmail(
   email: string,
   firstName: string,
