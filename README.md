@@ -102,6 +102,7 @@ MYSQL_USER=root
 MYSQL_PASSWORD=term_project_root
 MYSQL_DATABASE=term_project
 
+TMDB_API_KEY=your_tmdb_api_key_here
 
 AUTH_SECRET=replace_with_a_long_random_secret
 CARD_ENCRYPTION_KEY=qwertyuiop
@@ -117,7 +118,9 @@ EMAIL_FROM=
 
 ## Poster Setup
 
-If seeded poster images are broken or missing, you can refresh them from TMDB with `scripts/fetch_posters.py`.
+When an admin adds a movie through the app and leaves the poster URL blank, the app automatically looks up a poster from TMDB. This requires `TMDB_API_KEY` to be set in `.env.local` (see Environment Variables above) — without it, the poster field is silently left empty.
+
+If seeded poster images are broken or missing, you can also backfill them in bulk from TMDB with `scripts/fetch_posters.py`.
 
 Install the Python dependencies:
 

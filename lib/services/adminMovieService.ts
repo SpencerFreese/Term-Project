@@ -16,6 +16,12 @@ import {
   type MovieStatus,
 } from "@/lib/movieForm";
 
+import type { PosterProvider } from "@/lib/providers/posterProvider";
+import { TMDBPosterAdapter } from "@/lib/providers/tmdbPosterAdapter";
+
+const defaultPosterProvider: PosterProvider =
+  new TMDBPosterAdapter();
+
 export class AdminMovieValidationError
   extends Error {
   constructor(
@@ -103,47 +109,15 @@ function isValidDate(
   );
 }
 
-async function fetchTmdbPoster(
-  title: string,
-) {
-  const apiKey =
-    process.env.TMDB_API_KEY;
-
-  if (!apiKey) {
-    return null;
-  }
-
-  try {
-    const response = await fetch(
-      `https://api.themoviedb.org/3/search/movie?api_key=${apiKey}&query=${encodeURIComponent(
-        title,
-      )}&language=en-US&page=1`,
-    );
-
-    if (!response.ok) {
-      return null;
-    }
-
-    const data =
-      await response.json();
-
-    const posterPath =
-      data.results?.[0]?.poster_path;
-
-    return posterPath
-      ? `https://image.tmdb.org/t/p/w500${posterPath}`
-      : null;
-  } catch {
-    return null;
-  }
-}
-
 async function normalizeMovieInput(
   body: unknown,
   {
     fetchPosterWhenMissing,
+    posterProvider =
+      defaultPosterProvider,
   }: {
     fetchPosterWhenMissing: boolean;
+    posterProvider?: PosterProvider;
   },
 ): Promise<MovieWriteInput> {
   if (!isObject(body)) {
@@ -301,7 +275,9 @@ async function normalizeMovieInput(
     fetchPosterWhenMissing
   ) {
     posterUrl =
-      await fetchTmdbPoster(title);
+      await posterProvider.getPosterUrl(
+        title,
+      );
   }
 
   return {
