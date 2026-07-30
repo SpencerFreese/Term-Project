@@ -5,7 +5,7 @@ import { getSession } from "@/lib/auth";
 import {
   CheckoutConflictError,
   CheckoutValidationError,
-  confirmCheckout,
+  checkoutService,
 } from "@/lib/services/checkoutService";
 
 type ConfirmCheckoutRequest = {
@@ -70,7 +70,7 @@ export async function POST(
         ? body.paymentCardId
         : Number(body.paymentCardId);
 
-    const order = await confirmCheckout({
+    const order = await checkoutService.completeCheckout({
       checkoutToken,
       userId: session.userId,
       confirmationEmail,
@@ -80,15 +80,15 @@ export async function POST(
     return NextResponse.json(
       {
         message:
-          "Your order was completed successfully.",
+          order.emailStatus === "sent"
+            ? "Your order was completed and the confirmation email was sent."
+            : "Your order was completed, but the confirmation email could not be sent.",
 
         orderId: order.orderId,
 
-        confirmationCode:
-          order.confirmationCode,
+        confirmationCode: order.confirmationCode,
 
-        confirmationUrl:
-          `/orders/${order.orderId}/confirmation`,
+        confirmationUrl: `/orders/${order.orderId}/confirmation`,
       },
       {
         status: 201,

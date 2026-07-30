@@ -1,5 +1,7 @@
 import "server-only";
 
+import { sendBookingConfirmationEmail } from "@/lib/email";
+
 import { randomBytes } from "crypto";
 
 import { withTransaction } from "@/lib/db";
@@ -25,6 +27,8 @@ import {findCardByIdForUpdate} from "@/lib/repositories/paymentCardRepository";
 
 
 import {
+  findOrderByIdForUser,
+  updateOrderEmailStatus,
   insertOrder,
   insertOrderSeats,
   insertOrderTicketItems,
@@ -33,12 +37,21 @@ import {
 
 import {
   TICKET_PRICES,
+  calculateOrderTotal,
+  calculateTax,
   calculateTicketSubtotal,
   getTotalTicketCount,
   type TicketQuantities,
 } from "@/lib/ticketPricing";
 
 import {isCardExpired, isValidEmail} from "@/lib/validators";
+
+import type {
+  CheckoutCoordinator,
+  CompleteCheckoutInput,
+  CompleteCheckoutResult,
+} from "@/lib/services/checkoutCoordinator";
+
 
 const MAX_TICKETS_PER_ORDER = 10;
 
@@ -205,12 +218,6 @@ export async function createBookingDraft(input: CreateBookingDraftInput) {
   );
 }
 
-export type ConfirmCheckoutInput = {
-  checkoutToken: string;
-  userId: number;
-  confirmationEmail: string;
-  paymentCardId: number;
-};
 
 function createConfirmationCode() {return `CE-${randomBytes(6).toString("hex").toUpperCase()}`}
 
@@ -254,7 +261,7 @@ export async function claimBookingDraftForUser(checkoutToken: string, userId: nu
 }
 
 
-export async function confirmCheckout(input: ConfirmCheckoutInput) {
+export class CheckoutService implements CheckoutCoordinator {async completeCheckout(input: CompleteCheckoutInput): Promise<CompleteCheckoutResult> {
   const checkoutToken = input.checkoutToken.trim();
 
   const confirmationEmail =input.confirmationEmail.trim().toLowerCase();
@@ -275,7 +282,7 @@ export async function confirmCheckout(input: ConfirmCheckoutInput) {
     throw new CheckoutValidationError("Select a valid payment card.");
   }
 
-  return withTransaction(
+  const completedOrder = await withTransaction(
     async (connection) => {await deleteExpiredCheckoutData(connection);
 
       const draft = await findBookingDraftForUpdate(connection, checkoutToken);
@@ -377,13 +384,10 @@ export async function confirmCheckout(input: ConfirmCheckoutInput) {
 
       const subtotal =calculateTicketSubtotal(quantities);
 
-      /*
-       * No tax rule has been specified yet.
-       * Keep tax at zero until your project
-       * defines the required tax rate.
-       */
-      const taxAmount = 0;
-      const totalAmount = subtotal + taxAmount;
+
+      const taxAmount = calculateTax(subtotal);
+      
+      const totalAmount = calculateOrderTotal(subtotal, taxAmount);
 
       const confirmationCode = createConfirmationCode();
 
@@ -476,17 +480,53 @@ export async function confirmCheckout(input: ConfirmCheckoutInput) {
 
       await deleteBookingDraft(connection,draft.bookingDraftId);
 
-      return {
+       return {
         orderId,
         confirmationCode,
         confirmationEmail,
         subtotal,
         taxAmount,
         totalAmount,
-        cardType:
-          card.cardType,
-        cardLastFour:lastFourDigits(card.cardNumberEncrypted),
+        cardType: card.cardType,
+        cardLastFour: lastFourDigits(card.cardNumberEncrypted),
       };
     },
   );
+
+    /*
+     * The transaction has already committed before
+     * email delivery begins. An email failure will
+     * not cancel or roll back the completed order.
+     */
+    let emailStatus: "sent" | "failed" = "failed";
+
+    try {
+      const order = await findOrderByIdForUser(completedOrder.orderId, input.userId,);
+
+      if (!order) {
+        throw new Error("The completed order could not be loaded for email delivery.");
+      }
+
+      const emailSent = await sendBookingConfirmationEmail(order);
+
+      emailStatus = emailSent ? "sent" : "failed";
+    } catch (error) {
+      console.error("Booking confirmation email error:", error);
+      emailStatus = "failed";
+    }
+
+    try {
+      await updateOrderEmailStatus(completedOrder.orderId, emailStatus);
+    } catch (error) {
+      console.error( "Unable to update the order email status:", error);
+    }
+
+    return {
+      ...completedOrder,
+      emailStatus,
+    };
+  }
 }
+
+export const checkoutService: CheckoutCoordinator =
+  new CheckoutService();

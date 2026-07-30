@@ -4,6 +4,8 @@ export const TICKET_PRICES = {
   child: 9.5,
 } as const;
 
+export const TAX_RATE = 0.06;
+
 export type TicketCategory =
   keyof typeof TICKET_PRICES;
 
@@ -29,4 +31,12 @@ export function getTotalTicketCount(quantities: TicketQuantities): number {
     quantities.senior +
     quantities.child
   );
+}
+
+export function calculateTax(subtotal: number): number {
+  return Math.round(subtotal * TAX_RATE * 100) / 100;
+}
+
+export function calculateOrderTotal(subtotal: number, taxAmount: number): number {
+  return Math.round((subtotal + taxAmount) * 100) / 100;
 }
