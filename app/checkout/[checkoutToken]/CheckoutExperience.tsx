@@ -4,7 +4,7 @@ import Link from "next/link";
 import {useEffect,useMemo, useState} from "react";
 import { useRouter } from "next/navigation";
 
-import {TICKET_PRICES, calculateTicketSubtotal, type TicketQuantities} from "@/lib/ticketPricing";
+import {TICKET_PRICES, calculateOrderTotal, calculateTax, calculateTicketSubtotal, type TicketQuantities} from "@/lib/ticketPricing";
 
 type CheckoutSeat = {
   seatId: number;
@@ -153,6 +153,8 @@ export default function CheckoutExperience({
   }, [seats]);
 
   const subtotal = calculateTicketSubtotal(quantities);
+  const taxAmount = calculateTax(subtotal);
+  const totalAmount = calculateOrderTotal(subtotal, taxAmount);
 
   const confirmationEmail =
     emailChoice === "account"
@@ -818,16 +820,21 @@ export default function CheckoutExperience({
             </p>
           </div>
 
-          <div className="flex items-center justify-between border-t border-zinc-200 pt-4 text-lg font-bold dark:border-zinc-800">
-            <span>
-              Total before tax
-            </span>
+          <div className="space-y-2 border-t border-zinc-200 pt-4 dark:border-zinc-800">
+            <div className="flex items-center justify-between text-sm">
+              <span>Subtotal</span>
+              <span>{currency.format(subtotal)}</span>
+            </div>
 
-            <span>
-              {currency.format(
-                subtotal,
-              )}
-            </span>
+            <div className="flex items-center justify-between text-sm">
+              <span>Tax (6%)</span>
+              <span>{currency.format(taxAmount)}</span>
+            </div>
+
+            <div className="flex items-center justify-between border-t border-zinc-200 pt-3 text-lg font-bold dark:border-zinc-800">
+              <span>Total</span>
+              <span>{currency.format(totalAmount)}</span>
+            </div>
           </div>
 
           <p className="text-xs text-zinc-500">
