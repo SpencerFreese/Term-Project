@@ -226,8 +226,8 @@ WHERE m.status = 'currently_playing';
 -- Project Hail Mary
 INSERT INTO showtimes (movie_id, theater_room_id, start_time, end_time, format_type, status)
 SELECT m.movie_id, r.theater_room_id,
-       '2026-07-01 14:00:00',
-       '2026-07-01 16:30:00',
+       '2026-08-01 14:00:00',
+       '2026-08-01 16:30:00',
        'Standard',
        'scheduled'
 FROM movies m
@@ -236,8 +236,8 @@ WHERE m.title = 'Project Hail Mary';
 
 INSERT INTO showtimes (movie_id, theater_room_id, start_time, end_time, format_type, status)
 SELECT m.movie_id, r.theater_room_id,
-       '2026-07-01 18:00:00',
-       '2026-07-01 20:30:00',
+       '2026-08-01 18:00:00',
+       '2026-08-01 20:30:00',
        'IMAX',
        'scheduled'
 FROM movies m
@@ -247,8 +247,8 @@ WHERE m.title = 'Project Hail Mary';
 -- Toy Story 5
 INSERT INTO showtimes (movie_id, theater_room_id, start_time, end_time, format_type, status)
 SELECT m.movie_id, r.theater_room_id,
-       '2026-07-02 13:00:00',
-       '2026-07-02 14:45:00',
+       '2026-08-02 13:00:00',
+       '2026-08-02 14:45:00',
        'Standard',
        'scheduled'
 FROM movies m
@@ -257,8 +257,8 @@ WHERE m.title = 'Toy Story 5';
 
 INSERT INTO showtimes (movie_id, theater_room_id, start_time, end_time, format_type, status)
 SELECT m.movie_id, r.theater_room_id,
-       '2026-07-02 17:30:00',
-       '2026-07-02 19:15:00',
+       '2026-08-02 17:30:00',
+       '2026-08-02 19:15:00',
        'IMAX',
        'scheduled'
 FROM movies m
@@ -268,8 +268,8 @@ WHERE m.title = 'Toy Story 5';
 -- Star Wars: The Mandalorian and Grogu
 INSERT INTO showtimes (movie_id, theater_room_id, start_time, end_time, format_type, status)
 SELECT m.movie_id, r.theater_room_id,
-       '2026-07-03 15:00:00',
-       '2026-07-03 17:15:00',
+       '2026-08-03 15:00:00',
+       '2026-08-03 17:15:00',
        'Standard',
        'scheduled'
 FROM movies m
@@ -278,8 +278,8 @@ WHERE m.title = 'Star Wars: The Mandalorian and Grogu';
 
 INSERT INTO showtimes (movie_id, theater_room_id, start_time, end_time, format_type, status)
 SELECT m.movie_id, r.theater_room_id,
-       '2026-07-03 19:30:00',
-       '2026-07-03 21:45:00',
+       '2026-08-03 19:30:00',
+       '2026-08-03 21:45:00',
        'IMAX',
        'scheduled'
 FROM movies m
@@ -289,8 +289,8 @@ WHERE m.title = 'Star Wars: The Mandalorian and Grogu';
 -- Scream 7
 INSERT INTO showtimes (movie_id, theater_room_id, start_time, end_time, format_type, status)
 SELECT m.movie_id, r.theater_room_id,
-       '2026-07-04 16:00:00',
-       '2026-07-04 18:00:00',
+       '2026-08-04 16:00:00',
+       '2026-08-04 18:00:00',
        'Standard',
        'scheduled'
 FROM movies m
@@ -299,8 +299,8 @@ WHERE m.title = 'Scream 7';
 
 INSERT INTO showtimes (movie_id, theater_room_id, start_time, end_time, format_type, status)
 SELECT m.movie_id, r.theater_room_id,
-       '2026-07-04 21:00:00',
-       '2026-07-04 23:00:00',
+       '2026-08-04 21:00:00',
+       '2026-08-04 23:00:00',
        'Standard',
        'scheduled'
 FROM movies m
@@ -310,8 +310,8 @@ WHERE m.title = 'Scream 7';
 -- Mortal Kombat II
 INSERT INTO showtimes (movie_id, theater_room_id, start_time, end_time, format_type, status)
 SELECT m.movie_id, r.theater_room_id,
-       '2026-07-05 14:30:00',
-       '2026-07-05 16:30:00',
+       '2026-08-05 14:30:00',
+       '2026-08-05 16:30:00',
        'Standard',
        'scheduled'
 FROM movies m
@@ -320,8 +320,8 @@ WHERE m.title = 'Mortal Kombat II';
 
 INSERT INTO showtimes (movie_id, theater_room_id, start_time, end_time, format_type, status)
 SELECT m.movie_id, r.theater_room_id,
-       '2026-07-05 20:00:00',
-       '2026-07-05 22:00:00',
+       '2026-08-05 20:00:00',
+       '2026-08-05 22:00:00',
        'IMAX',
        'scheduled'
 FROM movies m
@@ -331,8 +331,8 @@ WHERE m.title = 'Mortal Kombat II';
 -- The Super Mario Galaxy Movie
 INSERT INTO showtimes (movie_id, theater_room_id, start_time, end_time, format_type, status)
 SELECT m.movie_id, r.theater_room_id,
-       '2026-07-06 12:30:00',
-       '2026-07-06 14:15:00',
+       '2026-08-06 12:30:00',
+       '2026-08-06 14:15:00',
        'Standard',
        'scheduled'
 FROM movies m
@@ -341,8 +341,8 @@ WHERE m.title = 'The Super Mario Galaxy Movie';
 
 INSERT INTO showtimes (movie_id, theater_room_id, start_time, end_time, format_type, status)
 SELECT m.movie_id, r.theater_room_id,
-       '2026-07-06 17:00:00',
-       '2026-07-06 18:45:00',
+       '2026-08-06 17:00:00',
+       '2026-08-06 18:45:00',
        'IMAX',
        'scheduled'
 FROM movies m
