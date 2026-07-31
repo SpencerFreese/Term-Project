@@ -1,51 +1,46 @@
 import { NextRequest, NextResponse } from "next/server";
-import { jwtVerify } from "jose";
-import { SESSION_COOKIE_NAME } from "@/lib/auth";
+import { getSession, hasRole } from "@/lib/sessionService";
 
-const secret = new TextEncoder().encode(
-  process.env.AUTH_SECRET ?? "dev_secret_change_me_please",
-);
+const PROTECTED_ROUTES: {
+  prefix: string;
+  requiresAuth: boolean;
+  requiresAdmin: boolean;
+}[] = [
+  { prefix: "/admin",    requiresAuth: true, requiresAdmin: true  },
+  { prefix: "/profile",  requiresAuth: true, requiresAdmin: false },
+  { prefix: "/checkout", requiresAuth: true, requiresAdmin: false },
+  { prefix: "/orders",   requiresAuth: true, requiresAdmin: false },
+];
 
-async function verifyToken(token: string) {
-  try {
-    const verified = await jwtVerify(token, secret);
+function matchRoute(path: string) {
+  return PROTECTED_ROUTES.find((route) => path.startsWith(route.prefix));
+}
 
-    return verified.payload as {
-      userId: number;
-      email: string;
-      role: "customer" | "admin";
-    };
-  } catch {
-    return null;
-  }
+function redirectToLogin(request: NextRequest) {
+  const loginUrl = new URL("/login", request.url);
+  loginUrl.searchParams.set("returnTo", request.nextUrl.pathname);
+  return NextResponse.redirect(loginUrl);
 }
 
 export async function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname;
-  const token = request.cookies.get(SESSION_COOKIE_NAME)?.value;
-  const session = token ? await verifyToken(token) : null;
+  const session = await getSession(request);
+  const matchedRoute = matchRoute(path);
 
-  if (path.startsWith("/admin")) {
+  if (matchedRoute) {
     if (!session) {
-      return NextResponse.redirect(new URL("/login", request.url));
+      return redirectToLogin(request);
     }
 
-    if (session.role !== "admin") {
+    if (matchedRoute.requiresAdmin && !hasRole(session, "admin")) {
       return NextResponse.redirect(new URL("/", request.url));
     }
   }
 
-  if (path.startsWith("/profile")) {
-    if (!session) {
-      return NextResponse.redirect(new URL("/login", request.url));
-    }
-  }
-
   if (path === "/login" && session) {
-    if (session.role === "admin") {
+    if (hasRole(session, "admin")) {
       return NextResponse.redirect(new URL("/admin", request.url));
     }
-
     return NextResponse.redirect(new URL("/profile", request.url));
   }
 
@@ -53,5 +48,11 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/profile/:path*", "/login"],
+  matcher: [
+    "/admin/:path*",
+    "/profile/:path*",
+    "/checkout/:path*",
+    "/orders/:path*",
+    "/login",
+  ],
 };
