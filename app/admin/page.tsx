@@ -44,19 +44,19 @@ export default async function AdminPage() {
           </p>
         </Link>
 
-        <Link href="/admin/promotions" className="rounded-2xl border border-zinc-300 p-6 hover:bg-zinc-100 dark:border-zinc-800 dark:hover:bg-zinc-900">
+        <div href="/admin/promotions" className="rounded-2xl border border-zinc-300 p-6 hover:bg-zinc-100 dark:border-zinc-800 dark:hover:bg-zinc-900">
           <h2 className="text-xl font-semibold">Promotions</h2>
           <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
             Manage promotion codes and discounts.
           </p>
-        </Link>
+        </div>
 
-        <Link href="/admin/users" className="rounded-2xl border border-zinc-300 p-6 hover:bg-zinc-100 dark:border-zinc-800 dark:hover:bg-zinc-900">
+        <div href="/admin/users" className="rounded-2xl border border-zinc-300 p-6 hover:bg-zinc-100 dark:border-zinc-800 dark:hover:bg-zinc-900">
           <h2 className="text-xl font-semibold">Users</h2>
           <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
             View and manage user accounts.
           </p>
-        </Link>
+        </div>
 
         <Link href="/admin/showtimes" className="rounded-2xl border border-zinc-300 p-6 hover:bg-zinc-100 dark:border-zinc-800 dark:hover:bg-zinc-900">
           <h2 className="text-xl font-semibold">Showtimes</h2>
